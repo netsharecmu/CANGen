@@ -38,3 +38,22 @@
         python3 road.py
         ```
     - *Note that constant columns are kept, e.g., `Labels` are all 0 for normal traces or some signal are constant.*
+
+3. [OTIDS](https://sites.google.com/hksecurity.net/hcrl/Dataset/CAN-intrusion-dataset?pli=1)
+    - Normal, attack
+    - Example schema:
+        ```
+        Timestamp:          0.690329        ID: 0153    000    DLC: 8    b6 40 95 9c 71 15 68 82
+        Timestamp:          0.691181        ID: 0164    000    DLC: 8    81 e6 b1 8b ea 8f cd d6
+        Timestamp:          0.691743        ID: 05e4    000    DLC: 3    00 02 00
+        Timestamp:          0.698796        ID: 02c0    100    DLC: 0
+        ```
+    - Preprocess
+        1. Convert plaintext to column-based txt
+        2. Replace non-exist data with NaN
+        3. Convert hex strings (`ID`, `DATA_X`) to bit
+        ```Bash
+        cd preprocess/
+        python3 otids_txt2csv.py
+        ```
+        ```
