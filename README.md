@@ -21,4 +21,20 @@
         cd preprocess/
         python3 openxc_json2csv.py
         ```
-2. [ROAD]
+2. [ROAD](https://0xsam.com/road/)
+    - Ambient (normal), attack
+    - Example schema
+        ```
+        Label,Time,ID,Signal_1_of_ID,Signal_2_of_ID,Signal_3_of_ID,Signal_4_of_ID,Signal_5_of_ID,Signal_6_of_ID,Signal_7_of_ID,Signal_8_of_ID,Signal_9_of_ID,Signal_10_of_ID,Signal_11_of_ID,Signal_12_of_ID,Signal_13_of_ID,Signal_14_of_ID,Signal_15_of_ID,Signal_16_of_ID,Signal_17_of_ID,Signal_18_of_ID,Signal_19_of_ID,Signal_20_of_ID,Signal_21_of_ID,Signal_22_of_ID
+        0,0.0,1413,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,,,,,,,
+        0,1.9073486328125e-06,852,32765,0.0,120.0,11.0,,,,,,,,,,,,,,,,,,
+        0,3.0994415283203125e-06,1505,511,1.0,3.0,1.0,0.0,32768.0,,,,,,,,,,,,,,,,
+        ```
+    - Preprocess (~10 min):
+        1. Remove columns which are all NaN
+        2. Impute missing values
+        ```Bash
+        cd preprocess/
+        python3 road.py
+        ```
+    - *Note that constant columns are kept, e.g., `Labels` are all 0 for normal traces or some signal are constant.*
