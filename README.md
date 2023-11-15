@@ -48,12 +48,11 @@
         Timestamp:          0.691743        ID: 05e4    000    DLC: 3    00 02 00
         Timestamp:          0.698796        ID: 02c0    100    DLC: 0
         ```
-    - Preprocess
+    - Preprocess (~10 min):
         1. Convert plaintext to column-based txt
         2. Replace non-exist data with NaN
         3. Convert hex strings (`ID`, `DATA_X`) to bit
         ```Bash
         cd preprocess/
         python3 otids_txt2csv.py
-        ```
         ```
