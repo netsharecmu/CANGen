@@ -17,7 +17,7 @@ def all_same(items):
 
 
 def impute_missing_values(df, option="ffill"):
-    print("Raw dataframe:", df.shape)
+    # print("Raw dataframe:", df.shape)
     # flag indicators
     df_flags = df.isna()
 
@@ -35,15 +35,15 @@ def impute_missing_values(df, option="ffill"):
     assert df.shape == df_flags.shape
     assert df.isna().sum().sum() == 0
 
-    print("Dataframe after filling NaN:", df.shape)
+    # print("Dataframe after filling NaN:", df.shape)
 
     # col_name, % of non-NaN values
-    for col in df_flags.columns:
-        print("{}: {:.2f} ({}/{})".format(col, 1-count_nonzero_ratio(df_flags[col]), len(
-            df_flags[col])-count_nonzero(df_flags[col]), len(df_flags[col])))
+    # for col in df_flags.columns:
+    #     print("{}: {:.2f} ({}/{})".format(col, 1-count_nonzero_ratio(df_flags[col]), len(
+    #         df_flags[col])-count_nonzero(df_flags[col]), len(df_flags[col])))
 
-    for col in df.columns:
-        if all_same(df[col]):
-            warnings.warn("Column {} is constant!".format(col))
+    # for col in df.columns:
+    #     if all_same(df[col]):
+    #         warnings.warn("Column {} is constant!".format(col))
 
     return df, df_flags

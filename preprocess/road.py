@@ -8,6 +8,7 @@ from util import impute_missing_values
 def preprocess_single_road_csv(csv_file):
     df = pd.read_csv(csv_file)
     raw_columns = df.columns
+    num_raw_rows = df.shape[0]
     # 1. Drop signal columns that are all NaN
     df.dropna(axis=1, how='all', inplace=True)
 
@@ -16,10 +17,12 @@ def preprocess_single_road_csv(csv_file):
     print("Removed columns:", removed_columns)
 
     # 2. Impute missing values with `ffill` (i.e., forward fill)
-    print("Before imputation:", df.shape)
-
+    # print("Before imputation:", df.shape)
     df, _ = impute_missing_values(df)
-    print("After imputation:", df.shape)
+    # print("After imputation:", df.shape)
+    num_removed_rows = num_raw_rows - df.shape[0]
+    print(
+        f"{num_removed_rows}/{df.shape[0]} ({num_removed_rows/df.shape[0]*100:.2f}%) rows are removed")
 
     return df
 
