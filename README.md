@@ -4,7 +4,7 @@
 1. [OpenXC](http://openxcplatform.com/resources/traces.html)
     - NYC, Delhi, Taiwan
     - Example schema:
-        ```
+        ```Json
         {"name":"brake_pedal_status","value":true,"timestamp":1364310855.004000}
         {"name":"transmission_gear_position","value":"first","timestamp":1364310855.004000}
         {"name":"accelerator_pedal_position","value":0,"timestamp":1364323939.012000}
@@ -17,7 +17,7 @@
         1. select partial signals
         2. impute missing values
         3. convert to csv
-        ```
+        ```Bash
         cd preprocess/
         python3 openxc_json2csv.py
         ```
