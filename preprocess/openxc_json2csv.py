@@ -50,8 +50,6 @@ def openxc_json2csv(
     raw_df = pd.DataFrame(pd_dict_list)
 
     print("Before imputation:", raw_df.shape)
-    print(raw_df.shape)
-    # df.head()
 
     raw_df.to_csv(out_csv_file+".csv", index=False)
 
