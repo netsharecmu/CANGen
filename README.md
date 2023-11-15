@@ -1,6 +1,6 @@
 # CANGen
 
-# Datasets
+# Datasets and Preprocess
 1. [OpenXC](http://openxcplatform.com/resources/traces.html)
     - NYC, Delhi, Taiwan
     - Example schema:
@@ -13,4 +13,12 @@
         {"name":"accelerator_pedal_position","value":0,"timestamp":1364323939.035000}
         {"name":"torque_at_transmission","value":3,"timestamp":1364323939.031000}
         ```
-2. 
+    - Preprocess (~3 mins): 
+        1. select partial signals
+        2. impute missing values
+        3. convert to csv
+        ```
+        cd preprocess/
+        python3 openxc_json2csv.py
+        ```
+2. [ROAD]
