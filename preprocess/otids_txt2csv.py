@@ -53,11 +53,11 @@ def convert_to_csv(input_file, output_file, can_id_bits=11):
 
 
 if __name__ == "__main__":
-    for txt_file in os.listdir("../data/OTIDS"):
+    for txt_file in os.listdir("../data/otids"):
         if txt_file.endswith(".txt"):
             print(txt_file)
             convert_to_csv(
-                os.path.join("../data/OTIDS", txt_file),
-                os.path.join("../data/OTIDS", txt_file.split(".")[0]+".csv")
+                os.path.join("../data/otids", txt_file),
+                os.path.join("../data/otids", txt_file.split(".")[0]+".csv")
             )
             print()
