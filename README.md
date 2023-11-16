@@ -56,3 +56,19 @@
         cd preprocess/
         python3 otids_txt2csv.py
         ```
+
+4. [Car-hacking](https://ocslab.hksecurity.net/Datasets/car-hacking-dataset)
+    - Normal, attack
+    - Example schema: the same as OTIDS
+    - Preprocess:
+        - *Normal*: the same as OTIDS
+        ```
+        cd preprocess/
+        python3 car_hacking_normal_txt2csv.py
+        ```
+        - *Attack*: the same as OTIDS
+        ```
+        cd preprocess/
+        python3 car_hacking_attack_txt2csv.py
+        ```
+
