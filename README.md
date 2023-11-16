@@ -76,13 +76,7 @@
     - Normal, attack
     - Example: the same as OTIDS
     - Preprocess:
-        - *Normal*: the same as OTIDS
         ```
-        cd preprocess/
-        python3 survival_normal_txt2csv.py
+        python survival_txt2csv.py
         ```
-        - *Attack*: the same as OTIDS
-        ```
-        cd preprocess/
-        python3 survival_attack_txt2csv.py
-        ```
+
