@@ -18,8 +18,11 @@ def parse_row(row, can_id_bits=11):  # Set can_id_bits to 29 for extended CAN ID
     # Pad with NaN if less than 64 bits
     data_bits_padded = [int(bit) for bit in data_bits] + \
         [np.nan] * (64 - len(data_bits))
-    label = row['Label']
-    return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded + [label]
+
+    if 'Label' in row:
+        return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded + [row['Label']]
+    else:
+        return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded
 
 
 def convert_csv(input_csv, output_csv, can_id_bits=11):
@@ -27,13 +30,20 @@ def convert_csv(input_csv, output_csv, can_id_bits=11):
     df = pd.read_csv(input_csv, header=None, names=[
                      'Timestamp', 'CAN_ID', 'DLC', 'DATA_0', 'DATA_1', 'DATA_2', 'DATA_3', 'DATA_4', 'DATA_5', 'DATA_6', 'DATA_7', 'Label'])
 
+    # Check if 'Label' column is all NaN and drop it if true
+    # (This is the case for normal driving data)
+    if df['Label'].isna().all():
+        df.drop(columns=['Label'], inplace=True)
+
     # Process each row
     data_rows = [parse_row(row, can_id_bits)
                  for index, row in tqdm(df.iterrows())]
 
     # Create DataFrame with binary bits
-    column_names = ['Timestamp'] + [f'CAN_ID_{i}' for i in range(can_id_bits)] + [
-        f'DATA_{i}' for i in range(64)]
+    column_names = ['Timestamp'] + \
+        [f'CAN_ID_{i}' for i in range(can_id_bits)] + \
+        [f'DATA_{i}' for i in range(64)] + \
+        (['Label'] if 'Label' in df.columns else [])
     final_df = pd.DataFrame(data_rows, columns=column_names)
 
     # Save the new DataFrame to CSV
