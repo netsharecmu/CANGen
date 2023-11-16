@@ -69,6 +69,20 @@
         - *Attack*: the same as OTIDS
         ```
         cd preprocess/
-        python3 car_hacking_attack_txt2csv.py
+        python3 car_hacking_attack_csv2csv.py
         ```
 
+5. [Survival analysis](https://ocslab.hksecurity.net/Datasets/survival-ids)
+    - Normal, attack
+    - Example: the same as OTIDS
+    - Preprocess:
+        - *Normal*: the same as OTIDS
+        ```
+        cd preprocess/
+        python3 survival_normal_txt2csv.py
+        ```
+        - *Attack*: the same as OTIDS
+        ```
+        cd preprocess/
+        python3 survival_attack_txt2csv.py
+        ```

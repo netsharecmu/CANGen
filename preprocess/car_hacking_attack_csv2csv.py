@@ -18,7 +18,8 @@ def parse_row(row, can_id_bits=11):  # Set can_id_bits to 29 for extended CAN ID
     # Pad with NaN if less than 64 bits
     data_bits_padded = [int(bit) for bit in data_bits] + \
         [np.nan] * (64 - len(data_bits))
-    return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded
+    label = row['Label']
+    return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded + [label]
 
 
 def convert_csv(input_csv, output_csv, can_id_bits=11):
