@@ -130,3 +130,17 @@
         python3 car_challenge_csv2csv.py
         ```
 
+9. [TTIDS](https://github.com/EmbbededSecurity/AutomotiveSecurity/tree/main)
+    - Normal, attack
+    - Example:
+        ```
+        Timestamp,Arbitration_ID,DLC,Data,Class
+        0.001476,381,8,80 08 40 00 00 84 B3 05,Normal
+        0.001716,251,8,01 04 06 C0 00 01 08 80,Normal
+        0.001917,2B0,6,80 FF 00 07 96 C9,Normal
+        0.003657,47F,8,00 81 FF FA 00 78 00 07,Normal
+        ```
+    - Preprocess:
+        ```
+        python3 ttids_csv2csv.py
+        ```
