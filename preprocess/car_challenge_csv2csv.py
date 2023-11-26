@@ -14,10 +14,13 @@ def parse_row(row, has_subclass):
     can_id_binary = hex_to_binary(row["Arbitration_ID"], 11)
 
     # Convert Data to 64-bit binary, pad with NaN for missing bits
-    data_bytes = row['Data'].split(' ')
-    data_bits = ''.join([hex_to_binary(byte, 8) for byte in data_bytes])
-    data_bits_padded = [int(bit) for bit in data_bits] + \
-        [np.nan] * (64 - len(data_bits))
+    if row['DLC'] == 0:
+        data_bits_padded = [np.nan] * 64
+    else:
+        data_bytes = row['Data'].split(' ')
+        data_bits = ''.join([hex_to_binary(byte, 8) for byte in data_bytes])
+        data_bits_padded = [int(bit) for bit in data_bits] + \
+            [np.nan] * (64 - len(data_bits))
 
     # Construct the parsed row
     parsed_row = [row['Timestamp']] + [int(bit) for bit in can_id_binary] + [
