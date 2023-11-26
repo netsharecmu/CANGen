@@ -80,3 +80,18 @@
         python survival_txt2csv.py
         ```
 
+6. [Automotive CAN v2]()
+    - Normal, attack
+    - Example:
+        ```
+        (1536574931.814734) slcan0 12A#00F0707200003090
+        (1536574931.817030) slcan0 1F3#003C00
+        (1536574931.817835) slcan0 0C1#80260BC683EB4399
+        (1536574931.818045) slcan0 0C5#C0BFC74B80EBFD1B
+        (1536574931.818296) slcan0 0D1#00000000000000
+        (1536574931.818313) slcan0 185#1BA8
+        ```
+    - Preprocess:
+        ```
+        python3 automotive_can_v2_log2csv.py
+        ```
