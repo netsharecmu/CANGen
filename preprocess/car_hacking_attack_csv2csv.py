@@ -20,9 +20,9 @@ def parse_row(row, can_id_bits=11):  # Set can_id_bits to 29 for extended CAN ID
         [np.nan] * (64 - len(data_bits))
 
     if 'Label' in row:
-        return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded + [row['Label']]
+        return [timestamp] + [int(bit) for bit in can_id_binary] + [dlc] + data_bits_padded + [row['Label']]
     else:
-        return [timestamp] + [int(bit) for bit in can_id_binary] + data_bits_padded
+        return [timestamp] + [int(bit) for bit in can_id_binary] + [dlc] + data_bits_padded
 
 
 def convert_csv(input_csv, output_csv, can_id_bits=11):
@@ -42,6 +42,7 @@ def convert_csv(input_csv, output_csv, can_id_bits=11):
     # Create DataFrame with binary bits
     column_names = ['Timestamp'] + \
         [f'CAN_ID_{i}' for i in range(can_id_bits)] + \
+        ['DLC'] + \
         [f'DATA_{i}' for i in range(64)] + \
         (['Label'] if 'Label' in df.columns else [])
     final_df = pd.DataFrame(data_rows, columns=column_names)
