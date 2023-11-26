@@ -80,7 +80,7 @@
         python survival_txt2csv.py
         ```
 
-6. [Automotive CAN v2]()
+6. [Automotive CAN v2](https://data.4tu.nl/articles/dataset/Automotive_Controller_Area_Network_CAN_Bus_Intrusion_Dataset/12696950/2)
     - Normal, attack
     - Example:
         ```
@@ -94,4 +94,21 @@
     - Preprocess:
         ```
         python3 automotive_can_v2_log2csv.py
+        ```
+
+7. [SynCAN](https://github.com/etas/SynCAN)
+    - Normal, attack
+    - Example: 
+        ```
+        Label,Time,ID,Signal1,Signal2,Signal3,Signal4
+        0,2088.41338746,id5,0.0,0.9586862512831164
+        0,2089.55410634,id8,0.24683876529406004
+        0,2090.88561837,id3,0.2,1.0
+        0,2091.65840611,id7,0.06388818948282671,0.0
+        0,2100.36445933,id9,0.4495114006514658
+        0,2100.47555051,id1,0.0,0.0
+        ```
+    - Preprocess:
+        ```
+        python3 syncan_csv2csv.py
         ```
