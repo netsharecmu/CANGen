@@ -112,3 +112,21 @@
         ```
         python3 syncan_csv2csv.py
         ```
+
+8. [CarChallenge](https://ocslab.hksecurity.net/Datasets/carchallenge2020)
+    - Normal, attack
+    - Example:
+        ```
+        Timestamp,Arbitration_ID,DLC,Data,Class,SubClass
+        1597759710.1258929,153,8,20 A1 10 FF 00 FF 50 1F,Normal,Normal
+        1597759710.126151,220,8,13 24 7F 60 05 FF BF 10,Normal,Normal
+        1597759710.1263099,507,4,08 00 00 01,Normal,Normal
+        1597759710.127247,356,8,00 00 00 80 16 00 00 00,Normal,Normal
+        1597759710.12748,340,8,FC 03 00 E4 B7 21 FA 3C,Normal,Normal
+        1597759710.127698,366,7,33 B0 0A 33 30 00 01,Normal,Normal
+        ```
+    - Preprocess:
+        ```
+        python3 car_challenge_csv2csv.py
+        ```
+
