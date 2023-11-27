@@ -31,7 +31,7 @@ def convert_csv(input_csv, output_csv, can_id_bits=11):
     with open(input_csv, 'r') as f:
         lines = [line.strip().split(',') for line in f]
 
-    is_labelled = len(lines[0]) == 3 + int(lines[2]) + 1
+    is_labelled = len(lines[0]) == 3 + int(lines[0][2]) + 1
 
     # Process each line
     data_rows = []
