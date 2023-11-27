@@ -12,8 +12,9 @@ def hex_to_binary(hex_str, num_bits):
 def parse_row(row, can_id_bits=11):  # Set can_id_bits to 29 for extended CAN IDs
     timestamp = row['Timestamp']
     can_id_binary = hex_to_binary(row['CAN_ID'], can_id_bits)
-    dlc = row['DLC']
-    data_bytes = row[3:3+dlc]  # Assuming the data starts at the 4th column
+    dlc = int(row['DLC'])
+    # Assuming the data starts at the 4th column
+    data_bytes = [row[f'DATA_{i}'] for i in range(dlc)]
     data_bits = ''.join([hex_to_binary(byte, 8) for byte in data_bytes])
     # Pad with NaN if less than 64 bits
     data_bits_padded = [int(bit) for bit in data_bits] + \
@@ -26,25 +27,37 @@ def parse_row(row, can_id_bits=11):  # Set can_id_bits to 29 for extended CAN ID
 
 
 def convert_csv(input_csv, output_csv, can_id_bits=11):
-    # Read the CSV data into a pandas DataFrame
-    df = pd.read_csv(input_csv, header=None, names=[
-                     'Timestamp', 'CAN_ID', 'DLC', 'DATA_0', 'DATA_1', 'DATA_2', 'DATA_3', 'DATA_4', 'DATA_5', 'DATA_6', 'DATA_7', 'Label'])
+    # Parse the CSV file into a list of lists (not using pandas for variable length rows)
+    with open(input_csv, 'r') as f:
+        lines = [line.strip().split(',') for line in f]
 
-    # Check if 'Label' column is all NaN and drop it if true
-    # (This is the case for normal driving data)
-    if df['Label'].isna().all():
-        df.drop(columns=['Label'], inplace=True)
+    is_labelled = len(lines[0]) == 3 + 8 + 1
 
-    # Process each row
-    data_rows = [parse_row(row, can_id_bits)
-                 for index, row in tqdm(df.iterrows())]
+    # Process each line
+    data_rows = []
+    for line in tqdm(lines):
+        row = {}
+        row['Timestamp'], row['CAN_ID'], row['DLC'] = line[0], line[1], line[2]
+        for i in range(8):  # DATA
+            if i < int(row['DLC']):
+                row[f'DATA_{i}'] = line[3+i]
+            else:
+                row[f'DATA_{i}'] = np.nan
+        if len(line) == 3 + int(row['DLC']) + 1:  # with Label
+            row['Label'] = line[-1]
+        elif len(line) == 3 + int(row['DLC']):  # without label
+            pass
+        else:
+            raise ValueError("Length of line does not match!")
+
+        data_rows.append(parse_row(row, can_id_bits))
 
     # Create DataFrame with binary bits
     column_names = ['Timestamp'] + \
         [f'CAN_ID_{i}' for i in range(can_id_bits)] + \
         ['DLC'] + \
         [f'DATA_{i}' for i in range(64)] + \
-        (['Label'] if 'Label' in df.columns else [])
+        (['Label'] if is_labelled else [])
     final_df = pd.DataFrame(data_rows, columns=column_names)
 
     # Save the new DataFrame to CSV
