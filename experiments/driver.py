@@ -141,7 +141,9 @@ def main(args):
             logging_steps=current_config.logging_steps,
             save_steps=current_config.save_steps,
             save_total_limit=current_config.save_total_limit,
-            eval_steps=current_config.eval_steps)
+            eval_steps=current_config.eval_steps,
+            numeric_max_len=getattr(current_config, 'numeric_max_len', 10)
+        )
 
         rtf_model.fit(df, num_bootstrap=current_config.num_bootstrap)
         rtf_model.save(os.path.join(work_folder, "rtf_model"))

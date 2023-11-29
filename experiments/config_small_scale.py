@@ -89,7 +89,8 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
             "save_total_limit": None,
             "eval_steps": None,
             "epochs": 100,
-            "num_bootstrap": 100,
+            "num_bootstrap": 10,
             "random_state": random.randint(0, 2**16),
+            "numeric_max_len": 12,
         }
     )
