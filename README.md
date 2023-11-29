@@ -144,3 +144,17 @@
         ```
         python3 ttids_csv2csv.py
         ```
+
+# Datasets used
+- OpenXC
+    - india_New_Delhi_Railway_to_AIIMS.csv
+    - nyc_downtown_east.csv
+    - taiwan_HighwayNo2_can.csv
+- Car-hacking
+    - All attack traces
+    - Each attack trace is sampled to 1M samples, with train/test=0.7/0.3, i.e., train=700k, test=300k.
+- SynCAN
+    - train.csv (all normal by default)
+    - Downsampled to 1M samples
+
+- The preprocess of all other datasets may need to be adjusted accordingly.
