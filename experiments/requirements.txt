@@ -3,6 +3,11 @@ pandas
 tqdm
 notebook
 scikit-learn
+GPUtil
+toml
+seaborn
+geopandas
+config_io
 
 -e src/ctgan
 -e src/realtabformer
