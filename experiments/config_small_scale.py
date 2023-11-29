@@ -7,6 +7,7 @@ import copy
 import toml
 import json
 import shutil
+import random
 
 import pandas as pd
 
@@ -20,7 +21,7 @@ configs = Config()
 
 # DATASETS: Short descriptive name : file location
 # Input this manually for datasets to be run
-DATASET_NAME_FILE = {
+DICT_DATASET_FILENAME = {
     # OpenXC
     'openxc-nyc-downtown-east': os.path.join(
         CANGen_BASE_FOLDER, 'data_selected', 'openxc', 'nyc_downtown_east.csv'
@@ -73,3 +74,21 @@ DATASET_NAME_FILE = {
     )
 
 }
+
+# RTF-TAB-RAW
+for dataset_name, filename in DICT_DATASET_FILENAME.items():
+    configs['realtabformer-tabular'][dataset_name] = Config(
+        {
+            "raw_csv_file": filename,
+            # "n_layer": 3,
+            # "n_head": 4,
+            # "n_embd": 128,
+            "logging_steps": 1000,
+            "save_steps": 1000,
+            "save_total_limit": None,
+            "eval_steps": None,
+            "epochs": 100,
+            "num_bootstrap": 100,
+            "random_state": random.randint(0, 2**16),
+        }
+    )
