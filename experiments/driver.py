@@ -124,8 +124,6 @@ def main(args):
         from realtabformer import REaLTabFormer
         from transformers.models.gpt2 import GPT2Config
 
-        print("Random state:", current_config.random_state)
-
         # Non-relational or parent table.
         rtf_model = REaLTabFormer(
             model_type="tabular",
