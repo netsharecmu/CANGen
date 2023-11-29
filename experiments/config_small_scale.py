@@ -76,6 +76,7 @@ DICT_DATASET_FILENAME = {
 }
 
 # RTF-TAB-RAW
+configs['realtabformer-tabular'] = Config()
 for dataset_name, filename in DICT_DATASET_FILENAME.items():
     configs['realtabformer-tabular'][dataset_name] = Config(
         {

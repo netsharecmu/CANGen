@@ -72,12 +72,12 @@ def main(args):
     # Load configs
     if args.config_partition == 'small-scale':
         from config_small_scale import configs
-        from config_small_scale import NETGPT_BASE_FOLDER
+        from config_small_scale import CANGen_BASE_FOLDER
     else:
         raise ValueError(f"Unknown config partition: {args.config_partition}")
 
     RESULT_PATH_BASE = os.path.join(
-        NETGPT_BASE_FOLDER, "results", "vehiclesec2024")
+        CANGen_BASE_FOLDER, "results", "vehiclesec2024")
     RESULT_PATH_BASE_SMALL_SCALE = os.path.join(
         RESULT_PATH_BASE, "small-scale")
     RESULT_PATH = {
@@ -123,6 +123,8 @@ def main(args):
     if model_name == "realtabformer-tabular":
         from realtabformer import REaLTabFormer
         from transformers.models.gpt2 import GPT2Config
+
+        print("Random state:", current_config.random_state)
 
         # Non-relational or parent table.
         rtf_model = REaLTabFormer(
