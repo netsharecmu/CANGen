@@ -51,10 +51,11 @@ def openxc_json2csv(
 
     print("Before imputation:", raw_df.shape)
 
-    raw_df.to_csv(out_csv_file+".csv", index=False)
+    # raw_df.to_csv(out_csv_file+".csv", index=False)
 
     # 1. Select partial columns
     raw_df = raw_df[selected_cols]
+    raw_df.to_csv(out_csv_file+"_before_imputation.csv", index=False)
 
     # 2. Impute missing values (`ffill` i.e., forward fill)
     raw_df, raw_df_flags = impute_missing_values(raw_df)
