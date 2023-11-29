@@ -67,6 +67,9 @@ DATASET_NAME_FILE = {
         CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'gear_dataset_aligned_train.csv',
     ),
 
-
+    # SynCAN
+    'syncan-raw': os.path.join(
+        CANGen_BASE_FOLDER, 'data-selected', 'syncan', 'train.csv'
+    )
 
 }
