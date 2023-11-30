@@ -87,7 +87,7 @@ def get_timestamp_colname(dataset_name):
         raise ValueError(f"Unknown dataset name: {dataset_name}")
 
 
-# RTF-TAB-RAW
+# RTF-TAB
 configs['realtabformer-tabular'] = Config()
 for dataset_name, filename in DICT_DATASET_FILENAME.items():
     configs['realtabformer-tabular'][dataset_name] = Config(
@@ -104,6 +104,21 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
             "num_bootstrap": 100,
             "random_state": random.randint(0, 2**16),
             "numeric_max_len": 15,
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )
+
+# CTGAN
+configs['ctgan'] = Config()
+for dataset_name in [
+    'openxc-nyc-downtown-east',
+    'openxc-india-new-delhi-railway-to-aiims',
+    'openxc-taiwan-highwayno2-can'
+]:
+    configs['ctgan'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": ['brake_pedal_status', 'transmission_gear_position'],
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
