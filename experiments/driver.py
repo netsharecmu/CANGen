@@ -147,6 +147,7 @@ def main(args):
 
         rtf_model.fit(df, num_bootstrap=current_config.num_bootstrap)
         rtf_model.save(os.path.join(work_folder, "rtf_model"))
+        end_time_train = time.time()
         syn_df = rtf_model.sample(n_samples=len(df), gen_batch=1024)
 
     if model_name == "ctgan":
@@ -156,17 +157,31 @@ def main(args):
         print("discrete_columns:", discrete_columns)
 
         ctgan = CTGAN(epochs=100, verbose=True)
+
         print("Start CTGAN training...")
         ctgan.fit(df, discrete_columns)
+        end_time_train = time.time()
         print("CTGAN training finished...")
+
         ctgan.save(os.path.join(work_folder, "model.pt"))
         print("CTGAN model saved...")
+
         syn_df = ctgan.sample(len(df))
         print("CTGAN sampling finished...")
 
     # ==========================================================================
     # =================Postprocess synthetic data===============================
     # ==========================================================================
+    if args.order_csv_by_timestamp:
+        # sort by timestamp
+        syn_df = syn_df.sort_values(by=current_config.timestamp_colname)
+
+    # Export synthetic csv to the target folder
+    syn_df.to_csv(os.path.join(RESULT_PATH[args.config_partition]['csv'],
+                  f'{model_name}_{dataset_name}_{cur_time}.csv'), index=False)
+    print("Synthetic csv exported to:", os.path.join(
+        RESULT_PATH[args.config_partition]['csv'], f'{model_name}_{dataset_name}_{cur_time}.csv'))
+
     # Export running time
     end_time = time.time()
     time_elapsed = end_time - start_time
@@ -180,16 +195,6 @@ def main(args):
                 f"end_time_train: {datetime.datetime.fromtimestamp(end_time_train).strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write(
             f"end_time: {datetime.datetime.fromtimestamp(end_time).strftime('%Y-%m-%d %H:%M:%S')}\n")
-
-    if args.order_csv_by_timestamp:
-        # sort by timestamp
-        syn_df = syn_df.sort_values(by=current_config.timestamp_colname)
-
-    # Export synthetic csv to the target folder
-    syn_df.to_csv(os.path.join(RESULT_PATH[args.config_partition]['csv'],
-                  f'{model_name}_{dataset_name}_{cur_time}.csv'), index=False)
-    print("Synthetic csv exported to:", os.path.join(
-        RESULT_PATH[args.config_partition]['csv'], f'{model_name}_{dataset_name}_{cur_time}.csv'))
 
 
 if __name__ == "__main__":
