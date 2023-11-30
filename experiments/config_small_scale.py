@@ -39,7 +39,7 @@ DICT_DATASET_FILENAME = {
         CANGen_BASE_FOLDER, 'data', 'openxc', 'india', 'New_Delhi_Railway_to_AIIMS', 'New_Delhi_Railway_to_AIIMS_before_imputation.csv'
     ),
     'openxc-taiwan-highwayno2-can-no-imputation': os.path.join(
-        CANGen_BASE_FOLDER, 'data', 'openxc', 'taiwan', 'HighwayNo2_can', 'HighwayNo2_can_before_imputation.csv'
+        CANGen_BASE_FOLDER, 'data', 'openxc', 'taiwan', 'HighwayNo2-can', 'HighwayNo2-can_before_imputation.csv'
     ),
 
     # Car-hacking
