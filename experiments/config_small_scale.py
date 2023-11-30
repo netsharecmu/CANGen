@@ -70,10 +70,22 @@ DICT_DATASET_FILENAME = {
 
     # SynCAN
     'syncan-raw': os.path.join(
-        CANGen_BASE_FOLDER, 'data-selected', 'syncan', 'train.csv'
+        CANGen_BASE_FOLDER, 'data_selected', 'syncan', 'train.csv'
     )
 
 }
+
+
+def get_timestamp_colname(dataset_name):
+    if 'openxc' in dataset_name:
+        return 'timestamp'
+    elif 'car-hacking' in dataset_name:
+        return 'Timestamp'
+    elif 'syncan' in dataset_name:
+        return 'Time'
+    else:
+        raise ValueError(f"Unknown dataset name: {dataset_name}")
+
 
 # RTF-TAB-RAW
 configs['realtabformer-tabular'] = Config()
@@ -91,6 +103,7 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
             "epochs": 100,
             "num_bootstrap": 100,
             "random_state": random.randint(0, 2**16),
-            "numeric_max_len": 12,
+            "numeric_max_len": 15,
+            "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )

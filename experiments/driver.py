@@ -152,6 +152,10 @@ def main(args):
     # ==========================================================================
     # =================Postprocess synthetic data===============================
     # ==========================================================================
+    if args.order_csv_by_timestamp:
+        # sort by timestamp
+        syn_df = syn_df.sort_values(by=current_config.timestamp_colname)
+
     # Export synthetic csv to the target folder
     syn_df.to_csv(os.path.join(RESULT_PATH[args.config_partition]['csv'],
                   f'{model_name}_{dataset_name}_{cur_time}.csv'), index=False)
