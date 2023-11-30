@@ -122,3 +122,20 @@ for dataset_name in [
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
+for dataset_name in [
+    'car-hacking-dos-bits',
+    'car-hacking-fuzzy-bits',
+    'car-hacking-rpm-bits',
+    'car-hacking-gear-bits'
+]:
+    discrete_columns = \
+        [f'CAN_ID_{i}' for i in range(11)] + \
+        [f'DATA_{i}' for i in range(64)] + \
+        ['Label']
+    configs['ctgan'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": discrete_columns,
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )

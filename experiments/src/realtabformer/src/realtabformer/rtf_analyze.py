@@ -711,10 +711,10 @@ class SyntheticDataBench:
             )
 
         n_jobs = 1
-        # cpu_count = os.cpu_count()
+        cpu_count = os.cpu_count()
 
-        # if cpu_count and cpu_count >= 4:
-        #     n_jobs = min(max(2, cpu_count // 4), 16)
+        if cpu_count and cpu_count >= 4:
+            n_jobs = min(max(2, cpu_count // 4), 16)
 
         if n_jobs == 1:
             for _ in tqdm(range(num_bootstrap), desc="Bootstrap round"):
