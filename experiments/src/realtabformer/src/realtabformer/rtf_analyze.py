@@ -148,7 +148,8 @@ class SyntheticDataBench:
 
         # Make predictions on the test data using the original training data
         try:
-            original_predictions = model.predict_proba(test.drop(target_col, axis=1))
+            original_predictions = model.predict_proba(
+                test.drop(target_col, axis=1))
         except AttributeError:
             original_predictions = model.predict(test.drop(target_col, axis=1))
 
@@ -157,9 +158,11 @@ class SyntheticDataBench:
 
         # Make predictions on the test data using the synthetic training data
         try:
-            synthetic_predictions = model.predict_proba(test.drop(target_col, axis=1))
+            synthetic_predictions = model.predict_proba(
+                test.drop(target_col, axis=1))
         except AttributeError:
-            synthetic_predictions = model.predict(test.drop(target_col, axis=1))
+            synthetic_predictions = model.predict(
+                test.drop(target_col, axis=1))
 
         # Return a dataframe with the actual values and predictions from both training sets
         return pd.DataFrame(
@@ -211,7 +214,8 @@ class SyntheticDataBench:
 
         if not categorical_features.empty:
             categorical_transformer = OneHotEncoder(handle_unknown="ignore")
-            transformers.append(("cat", categorical_transformer, categorical_features))
+            transformers.append(
+                ("cat", categorical_transformer, categorical_features))
 
         preprocessor = ColumnTransformer(transformers=transformers)
         preprocessor.fit(data)
@@ -254,7 +258,8 @@ class SyntheticDataBench:
                 _other = preprocessor.transform(_other)
 
                 _other = pd.DataFrame(
-                    _other if isinstance(_other, np.ndarray) else _other.toarray(),
+                    _other if isinstance(
+                        _other, np.ndarray) else _other.toarray(),
                     columns=column_names,
                     index=index,
                 )
@@ -494,7 +499,8 @@ class SyntheticDataBench:
         # Transform the test data and the synthetic test data
         synthetic = preprocessor.transform(synthetic)
         synthetic = pd.DataFrame(
-            synthetic if isinstance(synthetic, np.ndarray) else synthetic.toarray(),
+            synthetic if isinstance(
+                synthetic, np.ndarray) else synthetic.toarray(),
             columns=column_names,
         )
         X_test = synthetic
@@ -675,7 +681,8 @@ class SyntheticDataBench:
             test: pd.DataFrame = None
 
             if full_sensitivity:
-                original, test = train_test_split(train_data, test_size=2 * frac)
+                original, test = train_test_split(
+                    train_data, test_size=2 * frac)
                 synthetic = test.iloc[: len(test) // 2]
                 test = test.loc[test.index.difference(synthetic.index)]
             else:
@@ -686,8 +693,8 @@ class SyntheticDataBench:
 
                 _, source = train_test_split(train_data, test_size=test_size)
                 original = source.iloc[:n_train_size]
-                synthetic = source.iloc[n_train_size : n_train_size + n_size]
-                test = source.iloc[n_train_size + n_size :]
+                synthetic = source.iloc[n_train_size: n_train_size + n_size]
+                test = source.iloc[n_train_size + n_size:]
 
                 assert synthetic.shape[0] == test.shape[0]
 
@@ -704,16 +711,17 @@ class SyntheticDataBench:
             )
 
         n_jobs = 1
-        cpu_count = os.cpu_count()
+        # cpu_count = os.cpu_count()
 
-        if cpu_count and cpu_count >= 4:
-            n_jobs = min(max(2, cpu_count // 4), 16)
+        # if cpu_count and cpu_count >= 4:
+        #     n_jobs = min(max(2, cpu_count // 4), 16)
 
         if n_jobs == 1:
             for _ in tqdm(range(num_bootstrap), desc="Bootstrap round"):
                 values.append(bootstrap_inner_loop())
         else:
             print("Using parallel computation!!!")
+            print("Number of jobs:", n_jobs)
             with joblib.Parallel(n_jobs=n_jobs) as parallel:
                 values = parallel(
                     joblib.delayed(bootstrap_inner_loop)()

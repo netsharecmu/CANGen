@@ -158,3 +158,6 @@
     - Downsampled to 1M samples
 
 - The preprocess of all other datasets may need to be adjusted accordingly (by the time of 11/29/2023).
+
+# MISC
+1. RTF seems to be problematic when running boostrapping with multi-process... use single-process instead.
