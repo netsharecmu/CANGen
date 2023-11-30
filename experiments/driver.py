@@ -26,6 +26,7 @@ import subprocess
 import pandas as pd
 import numpy as np
 
+from tqdm import tqdm
 from config_io import Config
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
@@ -114,6 +115,10 @@ def main(args):
     # READ RAW DATA FILE and select related columns (e.g., drop `version`/`ihl`/`chksum`)
     if 'raw_csv_file' in current_config:  # realtabformer-tabular, realtabformer-timeseries, ctgan, tvae, tabddpm, crossformer, d3vae, scinet, dlinear, patchtst
         df = pd.read_csv(current_config.raw_csv_file)
+        # Car-hacking datasets: fill missing values with 0
+        if 'car-hacking' in dataset_name and 'bits' in dataset_name:
+            df = df.fillna(0)
+
         print(df.shape)
         print(df.columns)
 
@@ -172,6 +177,43 @@ def main(args):
     # ==========================================================================
     # =================Postprocess synthetic data===============================
     # ==========================================================================
+    # Car-hacking datasets
+    if 'car-hacking' in dataset_name and 'bits' in dataset_name:
+        def postprocess_car_hacking(syn_df):
+            # Function to convert CAN_ID fields to a hex string
+            def can_id_bin2hex(row):
+                binary_string = ''.join(
+                    [str(row[f'CAN_ID_{i}']) for i in range(11)])
+                return '{:04x}'.format(int(binary_string, 2))
+
+            # Function to convert DATA fields based on DLC
+            def data_fields_bin2hex(row):
+                bits_to_consider = int(row['DLC']) * 8
+                data_bits = ''.join(
+                    [str(row[f'DATA_{i}']) for i in range(bits_to_consider)])
+                return [f'{int(data_bits[i:i+8], 2):02x}' for i in range(0, len(data_bits), 8)]
+
+            # Convert DLC field to int
+            syn_df['DLC'] = syn_df['DLC'].astype(int)
+
+            converted_df = pd.DataFrame()
+            converted_df['Timestamp'] = syn_df['Timestamp']
+            converted_df['CAN_ID'] = syn_df.apply(can_id_bin2hex, axis=1)
+
+            # Convert DATA fields
+            data_transformed = syn_df.apply(
+                data_fields_bin2hex, axis=1).tolist()
+            for i in range(8):
+                converted_df[f'DATA_{i}'] = [item[i] if i < len(
+                    item) else '' for item in tqdm(data_transformed)]
+
+            # Copy the Label column
+            converted_df['Label'] = syn_df['Label']
+
+            return converted_df
+
+        syn_df = postprocess_car_hacking(syn_df)
+
     if args.order_csv_by_timestamp:
         # sort by timestamp
         syn_df = syn_df.sort_values(by=current_config.timestamp_colname)
