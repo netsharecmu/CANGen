@@ -15,3 +15,4 @@ git+https://github.com/sniperyyc/transformers.git
 
 -e src/ctgan
 -e src/realtabformer
+-e src/netshare
