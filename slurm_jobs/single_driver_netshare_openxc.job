@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -p GPU-shared
+#SBATCH --gres=gpu:v100-32:1
+#SBATCH -t 24:00:00
+#SBATCH -A cis230033p
+#SBATCH --mail-type=ALL
+
+#echo commands to stdout
+set -x
+
+#move to working directory
+cd $PROJECT/CANGen/experiments-netshare-openxc
+
+#load CUDA and Anaconda
+module load cuda
+module load anaconda3
+conda activate CANGen
+
+python3 driver.py \
+    --config_partition ${config_partition} \
+    --dataset_name ${dataset_name} \
+    --model_name ${model_name} \
+    --cur_time ${cur_time} \
+    --order_csv_by_timestamp
