@@ -8,6 +8,7 @@ toml
 seaborn
 geopandas
 config_io
+dask[complete]
 
 # Too new `transformers` will fail RTF
 # This is a self-cutomized version of `4.31.0.dev0`

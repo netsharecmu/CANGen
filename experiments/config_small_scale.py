@@ -32,6 +32,18 @@ DICT_DATASET_FILENAME = {
     'openxc-taiwan-highwayno2-can': os.path.join(
         CANGen_BASE_FOLDER, 'data_selected', 'openxc', 'taiwan_HighwayNo2_can.csv'
     ),
+
+    # OpenXC (Sessionized)
+    'openxc-nyc-downtown-east-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'openxc', 'nyc_downtown_east_sessionized.csv'
+    ),
+    'openxc-india-new-delhi-railway-to-aiims-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'openxc', 'india_New_Delhi_Railway_to_AIIMS_sessionized.csv'
+    ),
+    'openxc-taiwan-highwayno2-can-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'openxc', 'taiwan_HighwayNo2_can_sessionized.csv'
+    ),
+
     'openxc-nyc-downtown-east-no-imputation': os.path.join(
         CANGen_BASE_FOLDER, 'data', 'openxc', 'nyc', 'downtown-east', 'downtown-east_before_imputation.csv'
     ),
@@ -152,3 +164,74 @@ for dataset_name in ['syncan-flag']:
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
+
+# NetShare
+configs['netshare'] = Config()
+base_config = Config.load_from_file(
+    'src/netshare/netshare/configs/default/single_event_per_row.json'
+)
+# OpenXC
+for dataset_name in [
+    'openxc-nyc-downtown-east-sessionized',
+    'openxc-india-new-delhi-railway-to-aiims-sessionized',
+    'openxc-taiwan-highwayno2-can-sessionized'
+]:
+    c = copy.deepcopy(base_config)
+    c.global_config.original_data_file = DICT_DATASET_FILENAME[dataset_name]
+    c.global_config.overwrite = True
+    c.pre_post_processor.config.truncate = 'none'
+    c.global_config.n_chunks = 1
+    c.model.config.batch_size = 512
+    c.model.config.sample_len = [1]
+
+    c.model.config.epochs = 10
+    c.model.config.iterations = None
+    c.model.config.epoch_checkpoint_freq = 1
+    c.model.config.max_train_time = None
+
+    c.pre_post_processor.config.timestamp = {
+        "column": get_timestamp_colname(dataset_name),
+        "generation": True,
+        "encoding": "interarrival",
+        "normalization": "ZERO_ONE"
+    }
+    c.pre_post_processor.config.metadata = [
+        {
+            "column": "brake_pedal_status",
+            "type": "integer",
+            "encoding": "categorical"
+        },
+        {
+            "column": "accelerator_pedal_position_binned",
+            "type": "integer",
+            "encoding": "categorical"
+        },
+        {
+            "column": "session_id",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+            "log1p_norm": True
+        }
+    ]
+    c.pre_post_processor.config.timeseries = [
+        {
+            "column": "vehicle_speed",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+            "log1p_norm": True
+        },
+        {
+            "column": "engine_speed",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+            "log1p_norm": True
+        },
+        {
+            "column": "transmission_gear_position",
+            "type": "string",
+            "encoding": "categorical"
+        },
+    ]
+    c.timestamp_colname = get_timestamp_colname(dataset_name)
+
+    configs['netshare'][dataset_name] = c

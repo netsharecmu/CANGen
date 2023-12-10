@@ -174,6 +174,18 @@ def main(args):
         syn_df = ctgan.sample(len(df))
         print("CTGAN sampling finished...")
 
+    if model_name == "netshare":
+        import netshare.ray as ray
+        from netshare import Generator
+
+        ray.config.enabled = False
+        ray.init(address="auto")
+        generator = Generator(config=current_config_file_path)
+        generator.train_and_generate(work_folder=work_folder)
+        syn_df = pd.read_csv(
+            generator._pre_post_processor.best_syndf_filename_list[0])
+        ray.shutdown()
+
     # ==========================================================================
     # =================Postprocess synthetic data===============================
     # ==========================================================================
