@@ -114,7 +114,7 @@ def main(args):
     # ==========================================================================
     # READ RAW DATA FILE and select related columns (e.g., drop `version`/`ihl`/`chksum`)
     if 'raw_csv_file' in current_config:  # realtabformer-tabular, realtabformer-timeseries, ctgan, tvae, tabddpm, crossformer, d3vae, scinet, dlinear, patchtst
-        df = pd.read_csv(current_config.raw_csv_file, nrows=1000)
+        df = pd.read_csv(current_config.raw_csv_file)
         # Car-hacking datasets: fill missing values with 0
         if 'car-hacking' in dataset_name and 'bits' in dataset_name:
             df = df.fillna(0)
