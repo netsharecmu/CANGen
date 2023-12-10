@@ -79,6 +79,18 @@ DICT_DATASET_FILENAME = {
     'car-hacking-gear-hex': os.path.join(
         CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'gear_dataset_aligned_train.csv',
     ),
+    'car-hacking-dos-bits-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'DoS_dataset_aligned_train_bits_sessionized.csv'
+    ),
+    'car-hacking-fuzzy-bits-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'Fuzzy_dataset_aligned_train_bits_sessionized.csv'
+    ),
+    'car-hacking-rpm-bits-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'RPM_dataset_aligned_train_bits_sessionized.csv'
+    ),
+    'car-hacking-gear-bits-sessionized': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'car_hacking', 'gear_dataset_aligned_train_bits_sessionized.csv'
+    ),
 
     # SynCAN
     'syncan-raw': os.path.join(
@@ -240,3 +252,5 @@ for dataset_name in [
     c.timestamp_colname = get_timestamp_colname(dataset_name)
 
     configs['netshare'][dataset_name] = c
+
+# Car-hacking
