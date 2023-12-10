@@ -236,6 +236,26 @@ def main(args):
         syn_df.drop(columns=[f'{col}_Missing' for col in [
                     'Signal1', 'Signal2', 'Signal3', 'Signal4']], inplace=True)
 
+    # Sessionized OpenXC datasets (NetShare, RTF-Time)
+    elif 'openxc' in dataset_name and 'sessionized' in dataset_name:
+        syn_df['accelerator_pedal_position_binned'] = syn_df['accelerator_pedal_position_binned'].astype(
+            int)
+
+        raw_df = pd.read_csv(current_config.global_config.original_data_file)
+        _, bin_edges = pd.cut(raw_df['accelerator_pedal_position'],
+                              bins=current_config.pre_post_processor.config.sessionize.n_bins, retbins=True)
+        # Function to sample a random value within the bin range
+
+        def sample_from_bin(bin_index):
+            if bin_index >= len(bin_edges) - 1:
+                return np.nan
+            lower_bound = bin_edges[bin_index]
+            upper_bound = bin_edges[bin_index + 1]
+            return np.random.uniform(lower_bound, upper_bound)
+
+        syn_df['accelerator_pedal_position'] = syn_df['accelerator_pedal_position_binned'].apply(
+            sample_from_bin)
+
     if args.order_csv_by_timestamp:
         # sort by timestamp
         syn_df = syn_df.sort_values(by=current_config.timestamp_colname)

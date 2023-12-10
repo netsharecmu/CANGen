@@ -184,10 +184,15 @@ for dataset_name in [
     c.model.config.batch_size = 512
     c.model.config.sample_len = [1]
 
-    c.model.config.epochs = 10
+    c.model.config.epochs = 1000
     c.model.config.iterations = None
-    c.model.config.epoch_checkpoint_freq = 1
+    c.model.config.epoch_checkpoint_freq = 50
     c.model.config.max_train_time = None
+
+    c.pre_post_processor.config.sessionize = {
+        "n_bins": 20,
+        "num_per_session": 10
+    }
 
     c.pre_post_processor.config.timestamp = {
         "column": get_timestamp_colname(dataset_name),
