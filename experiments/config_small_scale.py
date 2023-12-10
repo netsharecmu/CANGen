@@ -71,7 +71,11 @@ DICT_DATASET_FILENAME = {
     # SynCAN
     'syncan-raw': os.path.join(
         CANGen_BASE_FOLDER, 'data_selected', 'syncan', 'train.csv'
-    )
+    ),
+
+    'syncan-flag': os.path.join(
+        CANGen_BASE_FOLDER, 'data_selected', 'syncan', 'train_flags.csv'
+    ),
 
 }
 
@@ -93,9 +97,9 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
     configs['realtabformer-tabular'][dataset_name] = Config(
         {
             "raw_csv_file": filename,
-            # "n_layer": 3,
-            # "n_head": 4,
-            # "n_embd": 128,
+            "n_layer": 3,
+            "n_head": 4,
+            "n_embd": 128,
             "logging_steps": 1000,
             "save_steps": 10000,
             "save_total_limit": 10,
@@ -136,6 +140,15 @@ for dataset_name in [
         {
             "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
             "discrete_columns": discrete_columns,
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )
+for dataset_name in ['syncan-flag']:
+    configs['ctgan'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": ['Label', 'ID'] +
+            [f'Signal{i+1}_Missing' for i in range(4)],
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )

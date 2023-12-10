@@ -114,7 +114,7 @@ def main(args):
     # ==========================================================================
     # READ RAW DATA FILE and select related columns (e.g., drop `version`/`ihl`/`chksum`)
     if 'raw_csv_file' in current_config:  # realtabformer-tabular, realtabformer-timeseries, ctgan, tvae, tabddpm, crossformer, d3vae, scinet, dlinear, patchtst
-        df = pd.read_csv(current_config.raw_csv_file)
+        df = pd.read_csv(current_config.raw_csv_file, nrows=1000)
         # Car-hacking datasets: fill missing values with 0
         if 'car-hacking' in dataset_name and 'bits' in dataset_name:
             df = df.fillna(0)
@@ -214,6 +214,15 @@ def main(args):
             return converted_df
 
         syn_df = postprocess_car_hacking(syn_df)
+
+    # SynCAN datasets with flags added
+    elif 'syncan-flag' in dataset_name:
+        for col in ['Signal1', 'Signal2', 'Signal3', 'Signal4']:
+            syn_df.loc[syn_df[f'{col}_Missing'] == 1, col] = np.nan
+
+        # Removing the SignalX_Missing columns
+        syn_df.drop(columns=[f'{col}_Missing' for col in [
+                    'Signal1', 'Signal2', 'Signal3', 'Signal4']], inplace=True)
 
     if args.order_csv_by_timestamp:
         # sort by timestamp
