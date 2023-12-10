@@ -183,14 +183,14 @@ def main(args):
             # Function to convert CAN_ID fields to a hex string
             def can_id_bin2hex(row):
                 binary_string = ''.join(
-                    [str(row[f'CAN_ID_{i}']) for i in range(11)])
+                    [str(int(row[f'CAN_ID_{i}'])) for i in range(11)])
                 return '{:04x}'.format(int(binary_string, 2))
 
             # Function to convert DATA fields based on DLC
             def data_fields_bin2hex(row):
                 bits_to_consider = int(row['DLC']) * 8
                 data_bits = ''.join(
-                    [str(row[f'DATA_{i}']) for i in range(bits_to_consider)])
+                    [str(int(row[f'DATA_{i}'])) for i in range(bits_to_consider)])
                 return [f'{int(data_bits[i:i+8], 2):02x}' for i in range(0, len(data_bits), 8)]
 
             # Convert DLC field to int
@@ -199,6 +199,7 @@ def main(args):
             converted_df = pd.DataFrame()
             converted_df['Timestamp'] = syn_df['Timestamp']
             converted_df['CAN_ID'] = syn_df.apply(can_id_bin2hex, axis=1)
+            converted_df['DLC'] = syn_df['DLC']
 
             # Convert DATA fields
             data_transformed = syn_df.apply(
