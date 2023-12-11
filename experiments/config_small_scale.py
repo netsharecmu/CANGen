@@ -163,8 +163,8 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
             "save_total_limit": 10,
             "save_total_limit": None,
             "eval_steps": None,
-            "epochs": 100,
-            "num_bootstrap": 100,
+            "epochs": 1,
+            "num_bootstrap": 10,
             "random_state": random.randint(0, 2**16),
             "numeric_max_len": 15,
             "timestamp_colname": get_timestamp_colname(dataset_name)
@@ -423,3 +423,47 @@ for dataset_name in [
     c.timestamp_colname = get_timestamp_colname(dataset_name)
 
     configs['netshare'][dataset_name] = c
+
+# TabDDPM
+configs['tabddpm'] = Config()
+for dataset_name in [
+    'openxc-nyc-downtown-east',
+    'openxc-india-new-delhi-railway-to-aiims',
+    'openxc-taiwan-highwayno2-can'
+]:
+    configs['tabddpm'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": ['brake_pedal_status', 'transmission_gear_position'],
+            "target_column": 'brake_pedal_status',
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )
+for dataset_name in [
+    'car-hacking-dos-bits',
+    'car-hacking-fuzzy-bits',
+    'car-hacking-rpm-bits',
+    'car-hacking-gear-bits'
+]:
+    discrete_columns = \
+        [f'CAN_ID_{i}' for i in range(11)] + \
+        [f'DATA_{i}' for i in range(64)] + \
+        ['Label']
+    configs['tabddpm'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": discrete_columns,
+            "target_column": 'Label',
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )
+for dataset_name in ['syncan-flag']:
+    configs['tabddpm'][dataset_name] = Config(
+        {
+            "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
+            "discrete_columns": ['Label', 'ID'] +
+            [f'Signal{i+1}_Missing' for i in range(4)],
+            "target_column": 'Label',
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )

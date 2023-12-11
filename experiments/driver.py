@@ -164,16 +164,18 @@ def main(args):
         join_on = "session_id"
         session_keys = current_config.session_keys
         timeseries_keys = list(set(df.columns) - set(session_keys + [join_on]))
-        print("Raw df:", df.columns, df.shape)
+        print("Raw df:", df.columns, df.shape, df.isna().sum().sum())
 
         # Metadata (parent table)
         parent_df = pd.DataFrame(df.groupby(list(
             session_keys+[join_on])).groups.keys(), columns=list(session_keys+[join_on]))
-        print("parent_df:", parent_df.columns, parent_df.shape)
+        print("parent_df:", parent_df.columns,
+              parent_df.shape, df.isna().sum().sum())
 
         # Timeseries (child table)
         child_df = df[list(timeseries_keys+[join_on])]
-        print("child_df:", child_df.columns, child_df.shape)
+        print("child_df:", child_df.columns,
+              child_df.shape, df.isna().sum().sum())
 
         # Make sure that the key columns in both the
         # parent and the child table have the same name.
@@ -230,10 +232,11 @@ def main(args):
                 ).to_dict(),
             ),
             # set to `None` if experiencing the issue when fitting the child model: https://github.com/worldbank/REaLTabFormer/issues/22
-            parent_realtabformer_path=parent_model_path,
+            # parent_realtabformer_path=parent_model_path,
+            parent_realtabformer_path=None,
             checkpoints_dir=os.path.join(work_folder, "rtf_checkpoints"),
             samples_save_dir=os.path.join(work_folder, "rtf_samples"),
-            output_max_length=512,
+            output_max_length=2048,
             train_size=0.8,
             gradient_accumulation_steps=4,
             epochs=current_config.epochs,
