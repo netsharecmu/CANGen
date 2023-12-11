@@ -57,7 +57,7 @@ for ((i=1; i<=runs_per_job; i++)); do
             -e small_scale/${job_name}.out \
             --export=config_partition=${config_partition},dataset_name=${dataset},model_name=${model},cur_time=${timestamp} \
             --job-name=${job_name} \
-            single_driver_netshare_carhacking_syncan.job"
+            single_driver_netshare_openxc_acc_generated.job"
 
             echo $cmd
             eval $cmd
