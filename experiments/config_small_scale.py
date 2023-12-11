@@ -140,6 +140,37 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
         }
     )
 
+# REaLTabFormer (relational)
+configs['realtabformer-timeseries'] = Config()
+for dataset_name, filename in DICT_DATASET_FILENAME.items():
+    if 'openxc' in dataset_name:
+        session_keys = ['brake_pedal_status',
+                        'accelerator_pedal_position_binned', 'session_id']
+    elif 'car-hacking' in dataset_name:
+        session_keys = ['session_id'] + [f"CAN_ID_{i}" for i in range(11)]
+    elif 'syncan' in dataset_name:
+        session_keys = ['session_id', 'ID']
+
+    configs['realtabformer-timeseries'][dataset_name] = Config(
+        {
+            "raw_csv_file": filename,
+            "n_layer": 3,
+            "n_head": 4,
+            "n_embd": 128,
+            "logging_steps": 1000,
+            "save_steps": 10000,
+            "save_total_limit": 10,
+            "save_total_limit": None,
+            "eval_steps": None,
+            "epochs": 100,
+            "num_bootstrap": 100,
+            "random_state": random.randint(0, 2**16),
+            "numeric_max_len": 15,
+            "timestamp_colname": get_timestamp_colname(dataset_name)
+        }
+    )
+
+
 # CTGAN
 configs['ctgan'] = Config()
 for dataset_name in [
@@ -200,9 +231,9 @@ for dataset_name in [
     c.model.config.batch_size = 512
     c.model.config.sample_len = [1]
 
-    c.model.config.epochs = 1000
+    c.model.config.epochs = 5
     c.model.config.iterations = None
-    c.model.config.epoch_checkpoint_freq = 50
+    c.model.config.epoch_checkpoint_freq = 1
     c.model.config.max_train_time = None
 
     c.pre_post_processor.config.sessionize = {
@@ -241,6 +272,11 @@ for dataset_name in [
         },
         {
             "column": "engine_speed",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+        },
+        {
+            "column": "accelerator_pedal_position",
             "type": "float",
             "normalization": "ZERO_ONE",
         },

@@ -155,6 +155,13 @@ def main(args):
         end_time_train = time.time()
         syn_df = rtf_model.sample(n_samples=len(df), gen_batch=1024)
 
+    if model_name == "realtabformer-timeseries":
+        from realtabformer import REaLTabFormer
+        from pathlib import Path
+
+        from transformers import EncoderDecoderConfig
+        from transformers.models.gpt2 import GPT2Config
+
     if model_name == "ctgan":
         from ctgan import CTGAN
 
@@ -240,23 +247,27 @@ def main(args):
 
     # Sessionized OpenXC datasets (NetShare, RTF-Time)
     elif 'openxc' in dataset_name and 'sessionized' in dataset_name:
-        syn_df['accelerator_pedal_position_binned'] = syn_df['accelerator_pedal_position_binned'].astype(
-            int)
+        if 'accelerator_pedal_position' not in syn_df.columns:
+            syn_df['accelerator_pedal_position_binned'] = syn_df['accelerator_pedal_position_binned'].astype(
+                int)
 
-        raw_df = pd.read_csv(current_config.global_config.original_data_file)
-        _, bin_edges = pd.cut(raw_df['accelerator_pedal_position'],
-                              bins=current_config.pre_post_processor.config.sessionize.n_bins, retbins=True)
-        # Function to sample a random value within the bin range
+            raw_df = pd.read_csv(
+                current_config.global_config.original_data_file)
+            _, bin_edges = pd.cut(raw_df['accelerator_pedal_position'],
+                                  bins=current_config.pre_post_processor.config.sessionize.n_bins, retbins=True)
+            # Function to sample a random value within the bin range
 
-        def sample_from_bin(bin_index):
-            if bin_index >= len(bin_edges) - 1:
-                return np.nan
-            lower_bound = bin_edges[bin_index]
-            upper_bound = bin_edges[bin_index + 1]
-            return np.random.uniform(lower_bound, upper_bound)
+            def sample_from_bin(bin_index):
+                if bin_index >= len(bin_edges) - 1:
+                    return np.nan
+                lower_bound = bin_edges[bin_index]
+                upper_bound = bin_edges[bin_index + 1]
+                return np.random.uniform(lower_bound, upper_bound)
 
-        syn_df['accelerator_pedal_position'] = syn_df['accelerator_pedal_position_binned'].apply(
-            sample_from_bin)
+            syn_df['accelerator_pedal_position'] = syn_df['accelerator_pedal_position_binned'].apply(
+                sample_from_bin)
+        else:
+            print("accelerator_pedal_position already exists in the dataset")
 
     if args.order_csv_by_timestamp:
         # sort by timestamp
