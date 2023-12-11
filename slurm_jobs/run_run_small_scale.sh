@@ -18,4 +18,6 @@
 # bash run_small_scale.sh -p small-scale netshare -- openxc-nyc-downtown-east-sessionized openxc-india-new-delhi-railway-to-aiims-sessionized openxc-taiwan-highwayno2-can-sessionized
 
 # netshare, car-hacking/syncan-flag-sessionized
-bash run_small_scale.sh -p small-scale netshare -- car-hacking-dos-bits-sessionized car-hacking-fuzzy-bits-sessionized car-hacking-rpm-bits-sessionized car-hacking-gear-bits-sessionized syncan-flag-sessionized
+# bash run_small_scale.sh -p small-scale netshare -- car-hacking-dos-bits-sessionized car-hacking-fuzzy-bits-sessionized car-hacking-rpm-bits-sessionized car-hacking-gear-bits-sessionized syncan-flag-sessionized
+
+bash run_small_scale.sh -p small-scale realtabformer-timeseries -- openxc-nyc-downtown-east-sessionized openxc-india-new-delhi-railway-to-aiims-sessionized openxc-taiwan-highwayno2-can-sessionized car-hacking-dos-bits-sessionized car-hacking-fuzzy-bits-sessionized car-hacking-rpm-bits-sessionized car-hacking-gear-bits-sessionized syncan-flag-sessionized
