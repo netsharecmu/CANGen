@@ -227,7 +227,6 @@ for dataset_name in [
             "column": "session_id",
             "type": "float",
             "normalization": "ZERO_ONE",
-            "log1p_norm": True
         }
     ]
     c.pre_post_processor.config.timeseries = [
@@ -235,13 +234,11 @@ for dataset_name in [
             "column": "vehicle_speed",
             "type": "float",
             "normalization": "ZERO_ONE",
-            "log1p_norm": True
         },
         {
             "column": "engine_speed",
             "type": "float",
             "normalization": "ZERO_ONE",
-            "log1p_norm": True
         },
         {
             "column": "transmission_gear_position",
@@ -254,3 +251,68 @@ for dataset_name in [
     configs['netshare'][dataset_name] = c
 
 # Car-hacking
+for dataset_name in [
+    'car-hacking-dos-bits-sessionized',
+    'car-hacking-fuzzy-bits-sessionized',
+    'car-hacking-rpm-bits-sessionized',
+    'car-hacking-gear-bits-sessionized'
+]:
+    c = copy.deepcopy(base_config)
+    c.global_config.original_data_file = DICT_DATASET_FILENAME[dataset_name]
+    c.global_config.overwrite = True
+    c.pre_post_processor.config.truncate = 'none'
+    c.global_config.n_chunks = 1
+    c.model.config.batch_size = 512
+    c.model.config.sample_len = [1]
+
+    c.model.config.epochs = 400
+    c.model.config.iterations = None
+    c.model.config.epoch_checkpoint_freq = 50
+    c.model.config.max_train_time = None
+
+    c.pre_post_processor.config.sessionize = {
+        "num_per_session": 10
+    }
+
+    c.pre_post_processor.config.timestamp = {
+        "column": get_timestamp_colname(dataset_name),
+        "generation": True,
+        "encoding": "interarrival",
+        "normalization": "ZERO_ONE"
+    }
+    c.pre_post_processor.config.metadata = [
+        {
+            "column": f"CAN_ID_{i}",
+            "type": "integer",
+            "encoding": "categorical"
+        }
+        for i in range(11)
+    ] + \
+        [{
+            "column": "session_id",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+        }]
+    c.pre_post_processor.config.timeseries = [
+        {
+            "column": "DLC",
+            "type": "float",
+            "normalization": "ZERO_ONE",
+        },
+        {
+            "column": "Label",
+            "type": "string",
+            "encoding": "categorical"
+        },
+    ] + \
+        [
+        {
+            "column": "DATA_{i}",
+            "type": "integer",
+            "encoding": "categorical"
+        }
+        for i in range(64)
+    ]
+    c.timestamp_colname = get_timestamp_colname(dataset_name)
+
+    configs['netshare'][dataset_name] = c
