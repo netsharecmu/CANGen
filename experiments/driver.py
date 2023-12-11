@@ -236,6 +236,8 @@ def main(args):
         syn_df.drop(columns=[f'{col}_Missing' for col in [
                     'Signal1', 'Signal2', 'Signal3', 'Signal4']], inplace=True)
 
+        syn_df['ID'] = syn_df['ID'].astype(int)  # sanity conversion
+
     # Sessionized OpenXC datasets (NetShare, RTF-Time)
     elif 'openxc' in dataset_name and 'sessionized' in dataset_name:
         syn_df['accelerator_pedal_position_binned'] = syn_df['accelerator_pedal_position_binned'].astype(
