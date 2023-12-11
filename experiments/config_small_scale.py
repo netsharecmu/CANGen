@@ -307,7 +307,7 @@ for dataset_name in [
     ] + \
         [
         {
-            "column": "DATA_{i}",
+            "column": f"DATA_{i}",
             "type": "integer",
             "encoding": "categorical"
         }
