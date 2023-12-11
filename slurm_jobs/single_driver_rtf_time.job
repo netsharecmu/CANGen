@@ -2,7 +2,7 @@
 #SBATCH -N 1
 #SBATCH -p GPU-shared
 #SBATCH --gres=gpu:v100-32:1
-#SBATCH -t 24:00:00
+#SBATCH -t 18:00:00
 #SBATCH -A cis230033p
 #SBATCH --mail-type=ALL
 
@@ -10,7 +10,7 @@
 set -x
 
 #move to working directory
-cd $PROJECT/CANGen/experiments-rtf-time
+cd $PROJECT/CANGen/experiments-rtf-time-20231211
 
 #load CUDA and Anaconda
 module load cuda

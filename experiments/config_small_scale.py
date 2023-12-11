@@ -163,8 +163,8 @@ for dataset_name, filename in DICT_DATASET_FILENAME.items():
             "save_total_limit": 10,
             "save_total_limit": None,
             "eval_steps": None,
-            "epochs": 1,
-            "num_bootstrap": 10,
+            "epochs": 100,
+            "num_bootstrap": 100,
             "random_state": random.randint(0, 2**16),
             "numeric_max_len": 15,
             "timestamp_colname": get_timestamp_colname(dataset_name)
