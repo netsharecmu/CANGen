@@ -145,15 +145,16 @@ configs['realtabformer-timeseries'] = Config()
 for dataset_name, filename in DICT_DATASET_FILENAME.items():
     if 'openxc' in dataset_name:
         session_keys = ['brake_pedal_status',
-                        'accelerator_pedal_position_binned', 'session_id']
+                        'accelerator_pedal_position_binned']
     elif 'car-hacking' in dataset_name:
-        session_keys = ['session_id'] + [f"CAN_ID_{i}" for i in range(11)]
+        session_keys = [f"CAN_ID_{i}" for i in range(11)]
     elif 'syncan' in dataset_name:
-        session_keys = ['session_id', 'ID']
+        session_keys = ['ID']
 
     configs['realtabformer-timeseries'][dataset_name] = Config(
         {
             "raw_csv_file": filename,
+            "session_keys": session_keys,
             "n_layer": 3,
             "n_head": 4,
             "n_embd": 128,

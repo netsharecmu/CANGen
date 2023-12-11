@@ -158,9 +158,138 @@ def main(args):
     if model_name == "realtabformer-timeseries":
         from realtabformer import REaLTabFormer
         from pathlib import Path
-
         from transformers import EncoderDecoderConfig
         from transformers.models.gpt2 import GPT2Config
+
+        join_on = "session_id"
+        session_keys = current_config.session_keys
+        timeseries_keys = list(set(df.columns) - set(session_keys + [join_on]))
+        print("Raw df:", df.columns, df.shape)
+
+        # Metadata (parent table)
+        parent_df = pd.DataFrame(df.groupby(list(
+            session_keys+[join_on])).groups.keys(), columns=list(session_keys+[join_on]))
+        print("parent_df:", parent_df.columns, parent_df.shape)
+
+        # Timeseries (child table)
+        child_df = df[list(timeseries_keys+[join_on])]
+        print("child_df:", child_df.columns, child_df.shape)
+
+        # Make sure that the key columns in both the
+        # parent and the child table have the same name.
+        assert ((join_on in parent_df.columns) and
+                (join_on in child_df.columns))
+
+        # Non-relational or parent table. Don't include the
+        # unique_id field.
+        parent_model = REaLTabFormer(
+            model_type="tabular",
+            tabular_config=GPT2Config(
+                n_layer=getattr(current_config, 'n_layer', 12),
+                n_head=getattr(current_config, 'n_head', 12),
+                n_embd=getattr(current_config, 'n_embd', 768)
+            ),
+            checkpoints_dir=os.path.join(work_folder, "rtf_checkpoints"),
+            samples_save_dir=os.path.join(work_folder, "rtf_samples"),
+            gradient_accumulation_steps=4,
+            epochs=current_config.epochs,
+            batch_size=64,
+            random_state=current_config.random_state,
+            logging_steps=current_config.logging_steps,
+            save_steps=current_config.save_steps,
+            save_total_limit=current_config.save_total_limit,
+            eval_steps=current_config.eval_steps,
+            numeric_max_len=getattr(current_config, 'numeric_max_len', 10)
+        )
+        parent_model.fit(
+            parent_df.drop(join_on, axis=1),
+            num_bootstrap=current_config.num_bootstrap)
+
+        pdir = Path(os.path.join(work_folder, "rtf_parent/"))
+        parent_model.save(pdir)
+
+        # # Get the most recently saved parent model,
+        # # or a specify some other saved model.
+        # parent_model_path = pdir / "idXXX"
+        parent_model_path = sorted([
+            p for p in pdir.glob("id*") if p.is_dir()],
+            key=os.path.getmtime)[-1]
+
+        child_model = REaLTabFormer(
+            model_type="relational",
+            relational_config=EncoderDecoderConfig(
+                encoder=GPT2Config(
+                    n_layer=getattr(current_config, 'n_layer', 12),
+                    n_head=getattr(current_config, 'n_head', 12),
+                    n_embd=getattr(current_config, 'n_embd', 768)
+                ).to_dict(),
+                decoder=GPT2Config(
+                    n_layer=getattr(current_config, 'n_layer', 12),
+                    n_head=getattr(current_config, 'n_head', 12),
+                    n_embd=getattr(current_config, 'n_embd', 768)
+                ).to_dict(),
+            ),
+            # set to `None` if experiencing the issue when fitting the child model: https://github.com/worldbank/REaLTabFormer/issues/22
+            parent_realtabformer_path=parent_model_path,
+            checkpoints_dir=os.path.join(work_folder, "rtf_checkpoints"),
+            samples_save_dir=os.path.join(work_folder, "rtf_samples"),
+            output_max_length=512,
+            train_size=0.8,
+            gradient_accumulation_steps=4,
+            epochs=current_config.epochs,
+            batch_size=16,
+            random_state=current_config.random_state,
+            logging_steps=current_config.logging_steps,
+            save_steps=current_config.save_steps,
+            save_total_limit=current_config.save_total_limit,
+            eval_steps=current_config.eval_steps,
+            numeric_max_len=getattr(current_config, 'numeric_max_len', 10)
+        )
+
+        child_model.fit(
+            df=child_df,
+            in_df=parent_df,
+            join_on=join_on,
+            num_bootstrap=current_config.num_bootstrap)
+
+        pdir = Path(os.path.join(work_folder, "rtf_child/"))
+        child_model.save(pdir)
+
+        # Generate parent samples.
+        print("Start generating parent samples...")
+        parent_samples = parent_model.sample(len(parent_df), gen_batch=1024)
+        print("Finish generating parent samples...")
+
+        # Create the unique ids based on the index.
+        parent_samples.index.name = join_on
+        parent_samples = parent_samples.reset_index()
+
+        # Generate the relational observations.
+        print("Start generating child samples...")
+        child_samples = child_model.sample(
+            input_unique_ids=parent_samples[join_on],
+            input_df=parent_samples.drop(join_on, axis=1),
+            gen_batch=64)
+        child_samples.index.name = join_on
+        print("Finish generating child samples...")
+
+        print("Parent df:", parent_samples.shape, parent_samples.columns)
+        print(parent_samples.head())
+        print("Child df:", child_samples.shape, child_samples.columns)
+        print(child_samples.head())
+
+        # merge parent and child tables
+        syn_df = child_samples.merge(parent_samples, on=join_on)
+        assert syn_df.shape[0] == child_samples.shape[0]  # sanity check
+
+        # Child table is huge... cleaning up GPU memory for BERT inference later
+        print("Initial GPU Usage")
+        gpu_usage()
+        del parent_model, child_model
+        gc.collect()
+        torch.cuda.empty_cache()
+        print("GPU Usage after emptying the cache")
+        gpu_usage()
 
     if model_name == "ctgan":
         from ctgan import CTGAN
