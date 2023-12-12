@@ -436,12 +436,27 @@ def main(args):
         toml_config['device'] = "cuda:0"
         toml_config['sample']['num_samples'] = len(df)
 
-        toml_config['diffusion_params']['num_timesteps'] = 1000
-        toml_config['model_params']['rtdl_params']['d_layers'] = [128, 128]
-        toml_config['model_params']['num_classes'] = current_config.num_classes
-        toml_config['train']['main']['batch_size'] = 1024
-        toml_config['train']['main']['steps'] = 1000
-        toml_config['train']['main']['lr'] = 0.001
+        if 'openxc' in dataset_name:
+            toml_config['diffusion_params']['num_timesteps'] = 1000
+            toml_config['model_params']['rtdl_params']['d_layers'] = [256, 256]
+            toml_config['model_params']['num_classes'] = current_config.num_classes
+            toml_config['train']['main']['batch_size'] = 1024
+            toml_config['train']['main']['steps'] = 1000
+            toml_config['train']['main']['lr'] = 0.001
+        elif 'car-hacking' in dataset_name:
+            toml_config['diffusion_params']['num_timesteps'] = 1000
+            toml_config['model_params']['rtdl_params']['d_layers'] = 5*[512]
+            toml_config['model_params']['num_classes'] = current_config.num_classes
+            toml_config['train']['main']['batch_size'] = 1024
+            toml_config['train']['main']['steps'] = 1000
+            toml_config['train']['main']['lr'] = 0.001
+        elif 'syncan' in dataset_name:
+            toml_config['diffusion_params']['num_timesteps'] = 1000
+            toml_config['model_params']['rtdl_params']['d_layers'] = [256, 256]
+            toml_config['model_params']['num_classes'] = current_config.num_classes
+            toml_config['train']['main']['batch_size'] = 1024
+            toml_config['train']['main']['steps'] = 1000
+            toml_config['train']['main']['lr'] = 0.001
 
         print(toml_config)
         with open(os.path.join(work_folder, 'config.toml'), 'w') as f:
@@ -474,8 +489,6 @@ def main(args):
             axis=1)
         print("Synthetic df:", syn_df.shape, syn_df.columns)
         print(syn_df.head())
-
-        ()+1
 
     # ==========================================================================
     # =================Postprocess synthetic data===============================
