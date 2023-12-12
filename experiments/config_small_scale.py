@@ -14,7 +14,7 @@ import pandas as pd
 from config_io import Config
 
 # Change this if you are working on different platforms
-CANGen_BASE_FOLDER = '/ocean/projects/cis230033p/yyin4/CANGen'
+CANGen_BASE_FOLDER = '/storage/CANGen'
 
 # {model_name: [a list of configs]}. The first key is always the model name, for ease of parsing
 configs = Config()
@@ -455,6 +455,10 @@ for dataset_name in [
             "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
             "discrete_columns": discrete_columns,
             "target_column": 'Label',
+            "target_column_mapping": {
+                'R': 0,  # normal
+                'T': 1  # injected
+            },
             "num_classes": len(set(pd.read_csv(DICT_DATASET_FILENAME[dataset_name])['Label'])),
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }

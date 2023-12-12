@@ -119,6 +119,10 @@ def main(args):
         if 'car-hacking' in dataset_name and 'bits' in dataset_name:
             df = df.fillna(0)
 
+            if model_name == 'tabddpm':  # Replace `str` target column with `int`
+                df[current_config.target_column] = df[current_config.target_column].map(
+                    current_config.target_column_mapping)
+
         print(df.shape)
         print(df.columns)
 
@@ -526,6 +530,11 @@ def main(args):
 
             # Copy the Label column
             converted_df['Label'] = syn_df['Label']
+
+            if model_name == 'tabddpm':
+                # Map int target column back to str
+                converted_df['Label'] = converted_df['Label'].map(
+                    {v: k for k, v in current_config.target_column_mapping.items()})
 
             return converted_df
 
