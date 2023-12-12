@@ -436,6 +436,7 @@ for dataset_name in [
             "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
             "discrete_columns": ['brake_pedal_status', 'transmission_gear_position'],
             "target_column": 'brake_pedal_status',
+            "num_classes": len(set(pd.read_csv(DICT_DATASET_FILENAME[dataset_name])['brake_pedal_status'])),
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
@@ -454,6 +455,7 @@ for dataset_name in [
             "raw_csv_file": DICT_DATASET_FILENAME[dataset_name],
             "discrete_columns": discrete_columns,
             "target_column": 'Label',
+            "num_classes": len(set(pd.read_csv(DICT_DATASET_FILENAME[dataset_name])['Label'])),
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
@@ -464,6 +466,7 @@ for dataset_name in ['syncan-flag']:
             "discrete_columns": ['Label', 'ID'] +
             [f'Signal{i+1}_Missing' for i in range(4)],
             "target_column": 'Label',
+            "num_classes": len(set(pd.read_csv(DICT_DATASET_FILENAME[dataset_name])['Label'])),
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )

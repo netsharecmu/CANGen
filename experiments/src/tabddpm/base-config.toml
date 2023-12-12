@@ -6,8 +6,8 @@ num_numerical_features = 20
 device = "cuda:1"
 
 [model_params]
-num_classes = 0
-is_y_cond = false
+num_classes = 2
+is_y_cond = true
 
 [model_params.rtdl_params]
 d_layers = [

@@ -260,7 +260,7 @@ def main(args):
 
         # Generate parent samples.
         print("Start generating parent samples...")
-        parent_samples = parent_model.sample(len(parent_df), gen_batch=1024)
+        parent_samples = parent_model.sample(len(parent_df), gen_batch=512)
         print("Finish generating parent samples...")
 
         # Create the unique ids based on the index.
@@ -272,7 +272,7 @@ def main(args):
         child_samples = child_model.sample(
             input_unique_ids=parent_samples[join_on],
             input_df=parent_samples.drop(join_on, axis=1),
-            gen_batch=64)
+            gen_batch=16)
         child_samples.index.name = join_on
         print("Finish generating child samples...")
 
@@ -324,6 +324,158 @@ def main(args):
         syn_df = pd.read_csv(
             generator._pre_post_processor.best_syndf_filename_list[0])
         ray.shutdown()
+
+    if model_name == "tabddpm":
+        data_split = [0.7, 0.3, 0]  # train, val, test; no test in our case
+        type_map = {'train': 0, 'val': 1, 'test': 2}
+
+        # remove constant columns
+        # df, constant_columns_mapping = remove_constant_columns(df)
+        # for constant_col, val in constant_columns_mapping.items():
+        #     if constant_col in current_config.discrete_columns:
+        #         current_config.discrete_columns.remove(constant_col)
+
+        def split_dataframe(input_df, ratios, seed=42):
+            df = input_df.copy(deep=True)
+            assert sum(ratios) == 1.0, "Sum of ratios must be 1.0"
+
+            # Compute the split sizes
+            train_ratio, val_ratio, test_ratio = ratios
+
+            if test_ratio == 0:
+                # Split the data into train and validation sets
+                train, val = train_test_split(
+                    df, test_size=val_ratio, random_state=seed)
+                return list(train.index), list(val.index), []
+            else:
+                # First, split the data into train+val and test
+                train_val, test = train_test_split(
+                    df, test_size=test_ratio, random_state=seed)
+
+                # Compute the new ratio for the validation set (original ratio relative to train+val)
+                relative_val_ratio = val_ratio / (1 - test_ratio)
+
+                # Split the train+val set into train and validation sets
+                train, val = train_test_split(
+                    train_val, test_size=relative_val_ratio, random_state=seed)
+
+                return list(train.index), list(val.index), list(test.index)
+
+        # train/val/test
+        train_idx, val_idx, test_idx = split_dataframe(df, data_split)
+        print("train_num, val_num, test_num: ", len(
+            train_idx), len(val_idx), len(test_idx))
+
+        os.makedirs(os.path.join(work_folder, "raw_dataset"),
+                    exist_ok=True)  # preprocessed raw dataset
+
+        # Categorical
+        categorical_columns = copy.deepcopy(current_config.discrete_columns)
+        if current_config.target_column in categorical_columns:
+            categorical_columns.remove(current_config.target_column)
+        print("Categorical columns: ", categorical_columns)
+        categorical_array = df[categorical_columns].to_numpy(dtype=str)
+        print("Catetgorical array shape:", categorical_array.shape)
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_cat_train.npy"), categorical_array[train_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_cat_val.npy"), categorical_array[val_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_cat_test.npy"), categorical_array[test_idx])
+
+        # Continuous
+        numeric_columns = sorted(
+            list(set(df.columns) - set(current_config.discrete_columns)))
+        if current_config.target_column in numeric_columns:
+            numeric_columns.remove(current_config.target_column)
+        print("Numeric columns:", numeric_columns)
+        numeric_array = df[numeric_columns].to_numpy()
+        print("Numeric array shape: ", numeric_array.shape)
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_num_train.npy"), numeric_array[train_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_num_val.npy"), numeric_array[val_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "X_num_test.npy"), numeric_array[test_idx])
+
+        # y_col only used for regression task on val set (for picking the best model of generation)
+        y_col = df[current_config.target_column]
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "y_train.npy"), y_col[train_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "y_val.npy"), y_col[val_idx])
+        np.save(os.path.join(work_folder, "raw_dataset",
+                "y_test.npy"), y_col[test_idx])
+
+        # Config native to tabddpm
+        config_info = {
+            "task_type": "multiclass",
+            "name": f"{model_name}_{dataset_name}",
+            "id": f"{cur_time}",
+            "train_size": len(train_idx),
+            "val_size": len(val_idx),
+            "test_size": len(test_idx),
+            "n_num_features": len(numeric_columns),
+            "n_cat_features": len(categorical_columns),
+        }
+
+        # Export info json
+        with open(os.path.join(work_folder, "raw_dataset", "info.json"), 'w') as f:
+            json.dump(config_info, f, indent=4)
+
+        # Read basic toml
+        basic_toml_config = toml.load('src/tabddpm/base-config.toml')
+        os.makedirs(os.path.join(work_folder, "results"),
+                    exist_ok=True)  # results folder
+        toml_config = copy.deepcopy(basic_toml_config)
+        toml_config['parent_dir'] = os.path.abspath(
+            os.path.join(work_folder, "results"))
+        toml_config['real_data_path'] = os.path.abspath(
+            os.path.join(work_folder, "raw_dataset"))
+        toml_config['num_numerical_features'] = len(numeric_columns)
+        toml_config['device'] = "cuda:0"
+        toml_config['sample']['num_samples'] = len(df)
+
+        toml_config['diffusion_params']['num_timesteps'] = 1000
+        toml_config['model_params']['rtdl_params']['d_layers'] = [128, 128]
+        toml_config['model_params']['num_classes'] = current_config.num_classes
+        toml_config['train']['main']['batch_size'] = 1024
+        toml_config['train']['main']['steps'] = 1000
+        toml_config['train']['main']['lr'] = 0.001
+
+        print(toml_config)
+        with open(os.path.join(work_folder, 'config.toml'), 'w') as f:
+            toml.dump(toml_config, f)
+
+        # Run TabDDPM (use conda env `tabddpm`)
+        exec_cmd(
+            f"cd src/tabddpm && python3 scripts/pipeline.py \
+                --config {os.path.abspath(os.path.join(work_folder, 'config.toml'))} \
+                --sample \
+                --train"
+        )
+
+        syn_numerical = np.load(os.path.join(
+            toml_config['parent_dir'], 'X_num_train.npy'))
+        print(syn_numerical[:2, :])
+        print("Numerical columns", numeric_columns)
+        syn_categorical = np.load(os.path.join(
+            toml_config['parent_dir'], 'X_cat_train.npy'))
+        print("Synthetic numerical array:", syn_numerical.shape)
+        print("Synthetic categorical array:", syn_categorical.shape)
+        syn_target = np.load(os.path.join(
+            toml_config['parent_dir'], 'y_train.npy'))
+
+        syn_df = pd.concat(
+            [pd.DataFrame(syn_numerical, columns=numeric_columns),
+             pd.DataFrame(syn_categorical,
+                          columns=categorical_columns),
+             pd.DataFrame(syn_target, columns=[current_config.target_column])],
+            axis=1)
+        print("Synthetic df:", syn_df.shape, syn_df.columns)
+        print(syn_df.head())
+
+        ()+1
 
     # ==========================================================================
     # =================Postprocess synthetic data===============================
