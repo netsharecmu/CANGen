@@ -515,6 +515,13 @@ def main(args):
 
             # Convert DLC field to int
             syn_df['DLC'] = syn_df['DLC'].astype(int)
+            # Convert CAN_ID_i and DATA_i fields to int in case they are not
+            for i in range(11):
+                syn_df[f'CAN_ID_{i}'] = syn_df[f'CAN_ID_{i}'].astype(
+                    float).astype(int)
+            for i in range(64):
+                syn_df[f'DATA_{i}'] = syn_df[f'DATA_{i}'].astype(
+                    float).astype(int)
 
             converted_df = pd.DataFrame()
             converted_df['Timestamp'] = syn_df['Timestamp']
