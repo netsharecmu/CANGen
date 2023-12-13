@@ -474,3 +474,5 @@ for dataset_name in ['syncan-flag']:
             "timestamp_colname": get_timestamp_colname(dataset_name)
         }
     )
+
+configs.dump_to_file("small-scale-config.json")
