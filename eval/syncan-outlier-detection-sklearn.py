@@ -64,7 +64,7 @@ def train_test_anomaly_detection(train_csv_path, test_csv_path, results_json_fil
         min_distances = np.min(distances, axis=1)
         mean_distance = np.mean(min_distances)
         std_distance = np.std(min_distances)
-        threshold = mean_distance + 2 * std_distance  # Set your threshold factor here
+        threshold = mean_distance + 0.1 * std_distance  # Set your threshold factor here
         y_pred_test = [1 if dist > threshold else 0 for dist in min_distances]
     elif model_type == 'dbscan':
         # Fit DBSCAN on the training data
@@ -81,7 +81,7 @@ def train_test_anomaly_detection(train_csv_path, test_csv_path, results_json_fil
         # Define a threshold for distance to consider a point as an anomaly
         # This threshold could be set based on domain knowledge or some percentile of the training distances
         distance_threshold = np.percentile(
-            distances[model.labels_[indices] != -1], 95)
+            distances[model.labels_[indices] != -1], 80)
 
         # Points in test set whose distance to the nearest train set neighbor is greater than the threshold are anomalies
         y_pred_test = [1 if dist >
@@ -134,14 +134,43 @@ if __name__ == '__main__':
                         default=None, help='Sample size')
     args = parser.parse_args()
 
-    train_test_anomaly_detection(
-        train_csv_path=args.train_csv_path,
-        test_csv_path=args.test_csv_path,
-        results_json_file=args.results_json_file,
-        model_type=args.model_type,
-        model_params=args.model_params,
-        sample_size=args.sample_size
-    )
+#     train_test_anomaly_detection(
+#         train_csv_path=args.train_csv_path,
+#         test_csv_path=args.test_csv_path,
+#         results_json_file=args.results_json_file,
+#         model_type=args.model_type,
+#         model_params=args.model_params,
+#         sample_size=args.sample_size
+#     )
+
+
+# train_test_anomaly_detection(
+#     '../data_selected/syncan/train.csv',
+#     '../data_selected/syncan/test_flooding.csv',
+#     model_type='ocsvm',
+#     sample_size=0.01)
+
+# train_test_anomaly_detection(
+#     '../data_selected/syncan/train.csv',
+#     '../data_selected/syncan/test_flooding.csv',
+#     model_type='iforest',
+#     sample_size=0.01)
+# train_test_anomaly_detection(
+#     '../data_selected/syncan/train.csv',
+#     '../data_selected/syncan/test_flooding.csv',
+#     model_type='lof',
+#     sample_size=0.01)
+# train_test_anomaly_detection(
+#     '../data_selected/syncan/train.csv',
+#     '../data_selected/syncan/test_flooding.csv',
+#     model_type='kmeans',
+#     sample_size=0.01)
+
+# train_test_anomaly_detection(
+#     '../data_selected/syncan/train.csv',
+#     '../data_selected/syncan/test_flooding.csv',
+#     model_type='dbscan',
+#     sample_size=0.01)
 
 # train_test_anomaly_detection(
 #     '../results/vehiclesec2024/small-scale/csv/realtabformer-tabular_syncan-flag_20231210131342271428670.csv',
