@@ -1,11 +1,13 @@
 import json
 import argparse
 import pandas as pd
+import numpy as np
 from sklearn.svm import OneClassSVM
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, f1_score
+from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
 
@@ -43,7 +45,7 @@ def train_test_anomaly_detection(train_csv_path, test_csv_path, results_json_fil
     elif model_type == 'iforest':
         model = IsolationForest(**(model_params or {}))
     elif model_type == 'lof':
-        model = LocalOutlierFactor(**(model_params or {}))
+        model = LocalOutlierFactor(novelty=True, **(model_params or {}))
     elif model_type == 'kmeans':
         model = KMeans(**(model_params or {}))
     elif model_type == 'dbscan':
@@ -52,24 +54,38 @@ def train_test_anomaly_detection(train_csv_path, test_csv_path, results_json_fil
         raise ValueError("Unsupported model type")
 
     # Train and predict
-    if model_type in ['ocsvm', 'iforest', 'kmeans', 'dbscan']:
+    if model_type in ['ocsvm', 'iforest', 'lof']:
         model.fit(X_train)
         y_pred_test = model.predict(X_test)
-        print(y_pred_test[:100])
-        print(y_test[:100])
-        if model_type != 'kmeans':
-            y_pred_test = [1 if pred == -1 else 0 for pred in y_pred_test]
-    elif model_type == 'lof':
-        model.fit(X_train)
-        y_pred_test = model.fit_predict(X_test)
         y_pred_test = [1 if pred == -1 else 0 for pred in y_pred_test]
-
-    # Handle KMeans specific case
-    if model_type == 'kmeans':
-        tqdm.write("Handling KMeans specific case...")
+    elif model_type == 'kmeans':
+        model.fit(X_train)
         distances = model.transform(X_test)
-        y_pred_test = [
-            1 if min(dist) > some_threshold_value else 0 for dist in distances]
+        min_distances = np.min(distances, axis=1)
+        mean_distance = np.mean(min_distances)
+        std_distance = np.std(min_distances)
+        threshold = mean_distance + 2 * std_distance  # Set your threshold factor here
+        y_pred_test = [1 if dist > threshold else 0 for dist in min_distances]
+    elif model_type == 'dbscan':
+        # Fit DBSCAN on the training data
+        model.fit(X_train)
+
+        # Use NearestNeighbors to find the distance to the nearest cluster
+        nn = NearestNeighbors(n_neighbors=1)
+        # Fit only on cluster points, excluding noise
+        nn.fit(X_train[model.labels_ != -1])
+
+        # Find the distance and indices of the nearest neighbors in the train set for each point in the test set
+        distances, indices = nn.kneighbors(X_test)
+
+        # Define a threshold for distance to consider a point as an anomaly
+        # This threshold could be set based on domain knowledge or some percentile of the training distances
+        distance_threshold = np.percentile(
+            distances[model.labels_[indices] != -1], 95)
+
+        # Points in test set whose distance to the nearest train set neighbor is greater than the threshold are anomalies
+        y_pred_test = [1 if dist >
+                       distance_threshold else 0 for dist in distances.ravel()]
 
     tqdm.write("Evaluating the model...")
     # Evaluate the model
