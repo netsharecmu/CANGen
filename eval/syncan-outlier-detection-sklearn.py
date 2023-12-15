@@ -104,7 +104,7 @@ def train_test_anomaly_detection(train_csv_path, test_csv_path, results_json_fil
     # tqdm.write("Process completed.")
     # Output results to JSON file if specified
     if results_json_file is not None:
-        tqdm.write(f"Outputting results to {results_json_file}...")
+        tqdm.write(f"Outputting results to {results_json_file}")
         with open(results_json_file, 'w') as f:
             json.dump({
                 'classification_report': classification_report(y_test, y_pred_test, output_dict=True),
@@ -134,19 +134,19 @@ if __name__ == '__main__':
                         default=None, help='Sample size')
     args = parser.parse_args()
 
-#     train_test_anomaly_detection(
-#         train_csv_path=args.train_csv_path,
-#         test_csv_path=args.test_csv_path,
-#         results_json_file=args.results_json_file,
-#         model_type=args.model_type,
-#         model_params=args.model_params,
-#         sample_size=args.sample_size
-#     )
+    train_test_anomaly_detection(
+        train_csv_path=args.train_csv_path,
+        test_csv_path=args.test_csv_path,
+        results_json_file=args.results_json_file,
+        model_type=args.model_type,
+        model_params=args.model_params,
+        sample_size=args.sample_size
+    )
 
 
 # train_test_anomaly_detection(
 #     '../data_selected/syncan/train.csv',
-#     '../data_selected/syncan/test_flooding.csv',
+#     '../data_selected/syncan/test_normal.csv',
 #     model_type='ocsvm',
 #     sample_size=0.01)
 
