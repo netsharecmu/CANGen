@@ -29,13 +29,13 @@ n_jobs = 0
 for train_file, test_file, od_model in product(synthetic_train_files, syncan_test_files, od_models):
     # print(train_file, test_file, od_model)
     # Create a job for each combination
-    job_name = f"od,{os.path.splitext(os.path.basename(train_file))[0]},{os.path.splitext(os.path.basename(test_file))[0]}_{od_model}"
+    job_name = f"od,{os.path.splitext(os.path.basename(train_file))[0]},{os.path.splitext(os.path.basename(test_file))[0]},{od_model}"
     print(job_name)
     with open(os.path.join("syncan_od_jobs", job_name+".job"), 'w') as f:
         f.write(f"#!/bin/bash\n")
         f.write(f"#SBATCH -N 1\n")
         f.write(f"#SBATCH -p RM-shared\n")
-        f.write(f"#SBATCH --ntasks-per-node=16\n")
+        f.write(f"#SBATCH --ntasks-per-node=64\n")
         f.write(f"#SBATCH -t 02:00:00\n")
         f.write(f"#SBATCH -A cie160013p\n")
         f.write(f"#SBATCH --mail-type=ALL\n\n")
@@ -52,6 +52,8 @@ for train_file, test_file, od_model in product(synthetic_train_files, syncan_tes
             f"python3 syncan-outlier-detection-sklearn.py --train_csv_path {train_file} --test_csv_path {test_file} --results_json_file {results_json_file} --model_type {od_model} --sample_size 0.1\n")
         f.close()
 
+    time.sleep(1)
+
     # Run the job using sbatch
     cmd = f"sbatch \
         -o syncan_od_jobs/{job_name}.out \
@@ -59,7 +61,7 @@ for train_file, test_file, od_model in product(synthetic_train_files, syncan_tes
         --job-name={job_name} \
         syncan_od_jobs/{job_name}.job"
     subprocess.Popen(cmd, shell=True)
-    time.sleep(1)
+    time.sleep(2)
 
     n_jobs += 1
     print(f"Currently created {n_jobs} jobs")
