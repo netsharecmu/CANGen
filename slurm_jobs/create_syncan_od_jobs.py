@@ -34,14 +34,14 @@ for train_file, test_file, od_model in product(synthetic_train_files, syncan_tes
     with open(os.path.join("syncan_od_jobs", job_name+".job"), 'w') as f:
         f.write(f"#!/bin/bash\n")
         f.write(f"#SBATCH -N 1\n")
-        f.write(f"#SBATCH -p GPU-shared\n")
-        f.write(f"#SBATCH --gres=gpu:v100-32:1\n")
+        f.write(f"#SBATCH -p RM-shared\n")
+        f.write(f"#SBATCH --ntasks-per-node=16\n")
         f.write(f"#SBATCH -t 02:00:00\n")
-        f.write(f"#SBATCH -A cis230033p\n")
+        f.write(f"#SBATCH -A cie160013p\n")
         f.write(f"#SBATCH --mail-type=ALL\n\n")
 
         f.write("set -x\n\n")
-        f.write("cd $PROJECT/CANGen/eval\n")
+        f.write("cd /ocean/projects/cis230033p/yyin4/CANGen/eval\n")
         f.write("module load cuda\n")
         f.write("module load anaconda3\n")
         f.write("conda activate CANGen\n\n")
@@ -62,7 +62,6 @@ for train_file, test_file, od_model in product(synthetic_train_files, syncan_tes
     time.sleep(1)
 
     n_jobs += 1
-
-    ()+1
+    print(f"Currently created {n_jobs} jobs")
 
 print("Number of jobs created: ", n_jobs)
