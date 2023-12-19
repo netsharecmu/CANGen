@@ -75,29 +75,29 @@ def train_test_model(train_csv_path, test_csv_path, results_json_file=None, mode
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--train_csv_path', type=str,
-    #                     required=True, help='Path to the training CSV file')
-    # parser.add_argument('--test_csv_path', type=str,
-    #                     required=True, help='Path to the test CSV file')
-    # parser.add_argument('--results_json_file', type=str,
-    #                     default=None, help='Path to the results JSON file')
-    # parser.add_argument('--model_type', type=str,
-    #                     default='decision_tree', help='Type of the model')
-    # parser.add_argument('--model_params', type=json.loads,
-    #                     default=None, help='Model parameters in JSON format')
-    # parser.add_argument('--sample_size', type=float,
-    #                     default=None, help='Sample size (fraction)')
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train_csv_path', type=str,
+                        required=True, help='Path to the training CSV file')
+    parser.add_argument('--test_csv_path', type=str,
+                        required=True, help='Path to the test CSV file')
+    parser.add_argument('--results_json_file', type=str,
+                        default=None, help='Path to the results JSON file')
+    parser.add_argument('--model_type', type=str,
+                        default='decision_tree', help='Type of the model')
+    parser.add_argument('--model_params', type=json.loads,
+                        default=None, help='Model parameters in JSON format')
+    parser.add_argument('--sample_size', type=float,
+                        default=None, help='Sample size (fraction)')
+    args = parser.parse_args()
 
-    # train_test_model(
-    #     train_csv_path=args.train_csv_path,
-    #     test_csv_path=args.test_csv_path,
-    #     results_json_file=args.results_json_file,
-    #     model_type=args.model_type,
-    #     model_params=args.model_params,
-    #     sample_size=args.sample_size
-    # )
+    train_test_model(
+        train_csv_path=args.train_csv_path,
+        test_csv_path=args.test_csv_path,
+        results_json_file=args.results_json_file,
+        model_type=args.model_type,
+        model_params=args.model_params,
+        sample_size=args.sample_size
+    )
 
     # print(
     #     train_test_model(
@@ -106,12 +106,12 @@ if __name__ == '__main__':
     #         model_type='decision_tree'
     #     ))
 
-    print(
-        train_test_model(
-            '../data_selected/car_hacking/RPM_dataset_aligned_train.csv',
-            '../data_selected/car_hacking/RPM_dataset_aligned_test.csv',
-            model_type='decision_tree'
-        ))
+    # print(
+    #     train_test_model(
+    #         '../data_selected/car_hacking/RPM_dataset_aligned_train.csv',
+    #         '../data_selected/car_hacking/RPM_dataset_aligned_test.csv',
+    #         model_type='decision_tree'
+    #     ))
 
     # print(
     #     train_test_model(
