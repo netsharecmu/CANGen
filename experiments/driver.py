@@ -535,6 +535,11 @@ def main(args):
                 converted_df[f'DATA_{i}'] = [item[i] if i < len(
                     item) else '' for item in tqdm(data_transformed)]
 
+            # Specify DATA_X columns as object types to avoid implicit conversion to float
+            for i in range(8):
+                converted_df[f'DATA_{i}'] = converted_df[f'DATA_{i}'].astype(
+                    object)
+
             # Copy the Label column
             converted_df['Label'] = syn_df['Label']
 
