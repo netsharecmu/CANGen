@@ -43,7 +43,7 @@ for arg in "$@"; do
 done
 
 task_count=0
-runs_per_job=3 # specify how many times to run each job
+runs_per_job=5 # specify how many times to run each job
 
 
 mkdir -p small_scale
@@ -57,7 +57,7 @@ for ((i=1; i<=runs_per_job; i++)); do
             -e small_scale/${job_name}.out \
             --export=config_partition=${config_partition},dataset_name=${dataset},model_name=${model},cur_time=${timestamp} \
             --job-name=${job_name} \
-            single_driver_rtf_time.job"
+            single_driver_tabddpm_carhacking.job"
 
             echo $cmd
             eval $cmd

@@ -14,7 +14,7 @@ import pandas as pd
 from config_io import Config
 
 # Change this if you are working on different platforms
-CANGen_BASE_FOLDER = '/storage/CANGen'
+CANGen_BASE_FOLDER = '/ocean/projects/cis230033p/yyin4/CANGen'
 
 # {model_name: [a list of configs]}. The first key is always the model name, for ease of parsing
 configs = Config()
