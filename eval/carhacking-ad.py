@@ -10,7 +10,12 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 
-def preprocess_data(df):
+def preprocess_data(csv_path):
+    dtype_dict = {}
+    for i in range(8):
+        dtype_dict[f'DATA_{i}'] = object
+    df = pd.read_csv(csv_path, dtype=dtype_dict)
+
     # Fill NA with '00' and convert hex strings to integers
     df.fillna('00', inplace=True)
     df['CAN_ID'] = df['CAN_ID'].apply(lambda x: int(x, 16))
@@ -21,10 +26,8 @@ def preprocess_data(df):
 
 def train_test_model(train_csv_path, test_csv_path, results_json_file=None, model_type='decision_tree', model_params=None, sample_size=None):
     # Load and preprocess datasets
-    train_df = pd.read_csv(train_csv_path)
-    test_df = pd.read_csv(test_csv_path)
-    train_df = preprocess_data(train_df)
-    test_df = preprocess_data(test_df)
+    train_df = preprocess_data(train_csv_path)
+    test_df = preprocess_data(test_csv_path)
 
     # Sampling if specified
     if sample_size:
