@@ -6,6 +6,7 @@ archive
 rsync*.sh
 results*/
 doc
+slurm_jobs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
