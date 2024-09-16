@@ -1,0 +1,19 @@
+numpy
+pandas
+tqdm
+notebook
+scikit-learn
+GPUtil
+toml
+seaborn
+geopandas
+config_io
+dask[complete]
+
+# Too new `transformers` will fail RTF
+# This is a self-cutomized version of `4.31.0.dev0`
+git+https://github.com/sniperyyc/transformers.git
+
+-e src/ctgan
+-e src/realtabformer
+-e src/netshare
