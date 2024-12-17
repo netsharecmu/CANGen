@@ -1,5 +1,17 @@
 # CANGen
 
+[[Paper (ACSW' 24)](https://ieeexplore.ieee.org/abstract/document/10628782)]
+[[Talk (ACSW' 24)]](https://acsw.unimore.it/2024/assets/videos/V06%20-%20Yin.mp4)
+
+**Authors:** 
+[[Yucheng Yin](https://sniperyyc.com/)]
+[[Jorge Guajardo Merchan](https://www.bosch.com/de/forschung/ueber-bosch-research/unsere-experten/jorge-guajardo-merchan/)]
+[[Pradeep Pappachan](https://www.linkedin.com/in/pradeep-pappachan-4a06051/)]
+[[Vyas Sekar](https://users.ece.cmu.edu/~vsekar/)]
+
+**Abstract:**
+Realistic CAN traces enable a wide range of automotive security applications including but not limited to anomaly detection, fingerprinting, simulation and testing. However, nowadays these applications are blocked by the sparsity of high-quality, diverse CAN traces. Building on the recent advances of Deep Generative Models (DGMs), we identify two key challenges when off-the-shelf DGMs are applied to CAN traces: generation and evaluation. We design an end-to-end, open-source framework CANGen which efficiently tackles the generation and evaluation of synthetic CAN traces with various DGMs. Our empirical evaluation shows that CANGen can efficiently generate high-fidelity synthetic CAN traces that meet the requirements of domain-specific properties and downstream tasks.
+
 # Datasets and Preprocess
 1. [OpenXC](http://openxcplatform.com/resources/traces.html)
     - NYC, Delhi, Taiwan
